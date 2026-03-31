@@ -1,60 +1,27 @@
-# Welcome, Reelora Contributor
+# Reelora
 
-[Setting Up the Development Environment](#setting-up-the-development-environment)
+A full-stack video sharing platform built with Next.js 16. Upload, discover, and engage with video content — with subscriptions, comments, likes, and search.
 
-[Pull Requests](#pull-requests)
+---
 
-## Setting Up the Development Environment
+## What it does
 
-1. Fork the repository.
-2. In your terminal, run the `git clone` command with the forked repository's URL, e.g.
+### Video Upload & Playback
 
-    ``` bash
-    git clone https://github.com/JohnDoe/reelora.git
-    ```
+Users can upload videos directly to Cloudinary from the browser. Cloudinary handles transcoding, thumbnail generation, and streaming. Videos play back on a dedicated watch page with view tracking.
 
-    This creates a local repository on your machine.
+### Feed & Discovery
 
-3. To keep your fork up to date with the development branch of the company's repository, run the following command.
+The home feed surfaces trending videos and, for signed-in users, the latest uploads from subscribed channels. A full-text search covers video titles, descriptions, and tags, with filters for sort order and upload date.
 
-    ```bash
-    git config remote.upstream.fetch "+refs/heads/development:refs/remotes/upstream/development" 
-    ```
+### Channels
 
-    Now, when you run `git fetch upstream`, Git will only fetch `upstream/development`.
+Every user has a channel page showing their profile and uploaded videos. Visitors can subscribe or unsubscribe directly from the channel.
 
-4. If you decide to pull in the updates, then use the following command.
+### Engagement
 
-    ``` bash
-    git pull upstream development
-    ```
+Signed-in users can like or dislike any video, leave top-level comments, and reply in threads. Comments support likes too. Users can delete their own comments.
 
-5. Run `git remote -v` to verify. You should see this.
+### Authentication
 
-    ``` bash
-    origin    https://github.com/JohnDoe/reelora.git (fetch)
-    origin    https://github.com/JohnDoe/reelora.git (push)
-    upstream  https://github.com/next-college/reelora.git (fetch)
-    upstream  https://github.com/next-college/reelora.git (push)
-    ```
-
-    *N/B*: If the origin does not show the forked repository's URL, use the command below to add it and then run `git remote -v` again to verify.
-
-    ``` bash
-    git remote add origin https://github.com/JohnDoe/EleQ.git
-    ```
-
-6. Run `npm install` from the root of your project to install already set up dependencies. Cheers! You're all set. Well done. 🎉
-
-## Pull Requests
-
-For a consistent PR pattern that is easy to understand, use the following convention for PR titles: `<type>: <brief description>`. Common types include:
-
-- **feat** — new feature
-- **fix** — bug fix
-- **docs** — documentation changes
-- **refactor** — code restructuring without changing behaviour
-- **test** — adding or updating tests
-- **chore** — maintenance tasks (dependencies, configs)
-- **perf** — performance improvements
-- **style** — formatting, missing semicolons, etc.
+Sign in with Google or with an email and password. Sessions are JWT-based. Uploading and account settings are only accessible to authenticated users.
