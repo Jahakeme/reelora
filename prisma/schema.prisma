@@ -1,0 +1,83 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../lib/generated/prisma"
+}
+
+
+datasource db {
+  provider = "mongodb"
+}
+
+enum LikeType {
+  LIKE
+  DISLIKE
+}
+
+model User {
+  id            String         @id @default(auto()) @map("_id") @db.ObjectId
+  name          String?
+  email         String         @unique
+  password      String?
+  image         String?
+  videos        Video[]
+  comments      Comment[]
+  likes         Like[]
+  subscriptions Subscription[] @relation("subscriber")
+  subscribers   Subscription[] @relation("channel")
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+}
+
+model Video {
+  id           String    @id @default(auto()) @map("_id") @db.ObjectId
+  title        String
+  description  String?
+  cloudinaryId String
+  url          String
+  thumbnail    String?
+  duration     Int? // seconds
+  tags         String[]
+  views        Int       @default(0)
+  owner        User      @relation(fields: [ownerId], references: [id])
+  ownerId      String    @db.ObjectId
+  comments     Comment[]
+  likes        Like[]
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+}
+
+model Comment {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  body      String
+  author    User     @relation(fields: [authorId], references: [id])
+  authorId  String   @db.ObjectId
+  video     Video    @relation(fields: [videoId], references: [id])
+  videoId   String   @db.ObjectId
+  parentId  String?  @db.ObjectId // null = top-level, set = reply
+  likes     Like[]
+  createdAt DateTime @default(now())
+}
+
+model Like {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  type      LikeType
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String   @db.ObjectId
+  video     Video?   @relation(fields: [videoId], references: [id])
+  videoId   String?  @db.ObjectId
+  comment   Comment? @relation(fields: [commentId], references: [id])
+  commentId String?  @db.ObjectId
+}
+
+model Subscription {
+  id           String @id @default(auto()) @map("_id") @db.ObjectId
+  subscriber   User   @relation("subscriber", fields: [subscriberId], references: [id])
+  subscriberId String @db.ObjectId
+  channel      User   @relation("channel", fields: [channelId], references: [id])
+  channelId    String @db.ObjectId
+}
