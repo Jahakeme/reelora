@@ -1,100 +1,76 @@
-import { NextRequest, NextResponse } from "next/server";
-import prisma from "@/prisma/connection";
+import { NextRequest } from "next/server";
 import argon2 from "argon2";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import prisma from "@/lib/prisma";
+import { ok, handleRouteError, ApiException } from "@/lib/api/respond";
+import { requireAuth } from "@/lib/api/requireAuth";
+import { registerUserSchema, updateUserSchema } from "@/lib/schemas/user";
 
-// Create user
-export async function POST(req:NextRequest) {
-    const { password, ...body } = await req.json();
-    const hashedPassword = await argon2.hash(password);
-    try {
-        // Check if user already exists
-        const existingUser = await prisma.user.findUnique({
-            where: { email: body.email }
-        });
+export async function POST(req: NextRequest) {
+  try {
+    const body = registerUserSchema.parse(await req.json());
 
-        if (existingUser) {
-            return NextResponse.json(
-                { message: "A user with this email already exists" },
-                { status: 409 }
-            );
-        }
-
-        const user = await prisma.user.create({
-            data: {
-                ...body,
-                password: hashedPassword,
-                lastCodeRequestAt: new Date(),
-             },
-        });
-
-        return NextResponse.json(
-            { message: "User created. Please verify your email.", email: user.email },
-            { status: 201 }
-        );
-    } catch (error) {
-        console.error("Signup error:", error);
-        return NextResponse.json(
-            {message:"Something went wrong"},
-            {status: 501}
-        )
+    const existing = await prisma.user.findUnique({
+      where: { email: body.email },
+    });
+    if (existing) {
+      throw new ApiException("CONFLICT", "A user with this email already exists");
     }
+
+    const hashedPassword = await argon2.hash(body.password);
+    const user = await prisma.user.create({
+      data: {
+        name: body.name,
+        email: body.email,
+        image: body.image,
+        password: hashedPassword,
+      },
+      select: { id: true, name: true, email: true, image: true },
+    });
+
+    return ok({ user }, { status: 201 });
+  } catch (err) {
+    return handleRouteError(err);
+  }
 }
 
-// Delete user
-export async function DELETE(req:NextRequest) {
-    const { id } = await req.json();
-    try {
-        const deletedUser = await prisma.user.delete({
-            where: { id }
-        })
-        return NextResponse.json(deletedUser, {status: 200})
-    } catch (_error) {
-        return NextResponse.json(
-            {message:"Something went wrong"},
-            {status: 501}
-        )
-    }
+export async function PUT(req: NextRequest) {
+  try {
+    const { userId } = await requireAuth();
+    const body = updateUserSchema.parse(await req.json());
+
+    const updated = await prisma.user.update({
+      where: { id: userId },
+      data: body,
+      select: { id: true, name: true, email: true, image: true },
+    });
+
+    return ok({ user: updated });
+  } catch (err) {
+    return handleRouteError(err);
+  }
 }
 
-// Update user
-export async function PUT(req:NextRequest) {
-    const { id, ...body } = await req.json();
-    try {
-        const updatedUser = await prisma.user.update({
-            where: { id },
-            data: { updatedAt: new Date(), ...body }
-        })
-        return NextResponse.json(updatedUser, {status: 200})
-    } catch (_error) {
-        return NextResponse.json(
-            {message:"Something went wrong"},
-            {status: 501}
-        )
-    }
+export async function DELETE() {
+  try {
+    const { userId } = await requireAuth();
+    await prisma.user.delete({ where: { id: userId } });
+    return ok({ success: true });
+  } catch (err) {
+    return handleRouteError(err);
+  }
 }
 
-// Get all users
 export async function GET() {
-    try {
-        const session = await getServerSession(authOptions);
-        const currentUserId = session?.user?.id;
-        
-        const allUsers = await prisma.user.findMany({
-            where: currentUserId ? { id: { not: currentUserId } } : {},
-            select: {
-                id: true,
-                name: true,
-                email: true,
-                image: true
-            }
-        });
-        return NextResponse.json(allUsers, {status: 200})
-    } catch (_error) {
-        return NextResponse.json(
-            {message:"Something went wrong"},
-            {status: 501}
-        )
-    }
+  try {
+    const { userId } = await requireAuth();
+
+    const users = await prisma.user.findMany({
+      where: { id: { not: userId } },
+      select: { id: true, name: true, email: true, image: true },
+    });
+
+    return ok({ users });
+  } catch (err) {
+    return handleRouteError(err);
+  }
 }
