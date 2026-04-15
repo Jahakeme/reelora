@@ -100,11 +100,12 @@ model Like {
 }
 
 model Subscription {
-  id           String @id @default(auto()) @map("_id") @db.ObjectId
-  subscriber   User   @relation("subscriber", fields: [subscriberId], references: [id])
-  subscriberId String @db.ObjectId
-  channel      User   @relation("channel", fields: [channelId], references: [id])
-  channelId    String @db.ObjectId
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  subscriber   User     @relation("subscriber", fields: [subscriberId], references: [id])
+  subscriberId String   @db.ObjectId
+  channel      User     @relation("channel", fields: [channelId], references: [id])
+  channelId    String   @db.ObjectId
+  createdAt    DateTime @default(now())
 
   @@unique([subscriberId, channelId])
 }
