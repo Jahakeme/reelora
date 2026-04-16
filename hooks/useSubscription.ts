@@ -1,13 +1,31 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
 interface SubscriptionState {
   subscribed: boolean;
 }
 
+function subscriptionKey(channelId: string) {
+  return ["subscription", channelId] as const;
+}
+
+async function fetchSubscription(channelId: string): Promise<SubscriptionState> {
+  const res = await fetch(`/api/subscriptions/${channelId}/status`);
+  if (!res.ok) return { subscribed: false };
+  return res.json();
+}
+
+export function useSubscription(channelId: string) {
+  return useQuery({
+    queryKey: subscriptionKey(channelId),
+    queryFn: () => fetchSubscription(channelId),
+    enabled: !!channelId,
+  });
+}
+
 export function useSubscribeMutation(channelId: string) {
   const queryClient = useQueryClient();
-  const key = ["subscription", channelId] as const;
+  const key = subscriptionKey(channelId);
 
   return useMutation({
     mutationFn: async (subscribed: boolean) => {

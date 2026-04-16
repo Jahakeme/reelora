@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import {
@@ -14,6 +14,8 @@ import {
 } from "@phosphor-icons/react";
 import VideoPlayer from "./VideoPlayer";
 import CommentList from "@/components/comment/CommentList";
+import { useLikes, useLikeMutation } from "@/hooks/useLike";
+import { useSubscription, useSubscribeMutation } from "@/hooks/useSubscription";
 
 interface VideoOwner {
   id: string;
@@ -33,10 +35,6 @@ interface VideoData {
   tags: string[];
   createdAt: string;
   owner: VideoOwner;
-  likes: number;
-  dislikes: number;
-  userVote: "LIKE" | "DISLIKE" | null;
-  isSubscribed: boolean;
 }
 
 interface RelatedVideo {
@@ -54,7 +52,8 @@ interface RelatedVideo {
 }
 
 interface WatchViewProps {
-  videoId: string;
+  video: VideoData;
+  related: RelatedVideo[];
 }
 
 function formatViews(views: number): string {
@@ -77,139 +76,18 @@ function formatSubscribers(count: number): string {
   return count.toString();
 }
 
-export default function WatchView({ videoId }: WatchViewProps) {
-  const [video, setVideo] = useState<VideoData | null>(null);
-  const [related, setRelated] = useState<RelatedVideo[]>([]);
-  const [loading, setLoading] = useState(true);
+export default function WatchView({ video, related }: WatchViewProps) {
   const [descExpanded, setDescExpanded] = useState(false);
-  const [currentVote, setCurrentVote] = useState<"LIKE" | "DISLIKE" | null>(null);
-  const [likeCount, setLikeCount] = useState(0);
-  const [dislikeCount, setDislikeCount] = useState(0);
-  const [subscribed, setSubscribed] = useState(false);
 
-  useEffect(() => {
-    async function fetchVideo() {
-      setLoading(true);
-      try {
-        const [videoRes, relatedRes] = await Promise.all([
-          fetch(`/api/videos/${videoId}`),
-          fetch(`/api/videos?exclude=${videoId}&limit=8`),
-        ]);
+  const { data: likes } = useLikes({ videoId: video.id });
+  const likeMutation = useLikeMutation({ videoId: video.id });
+  const { data: subData } = useSubscription(video.owner.id);
+  const subscribeMutation = useSubscribeMutation(video.owner.id);
 
-        if (videoRes.ok) {
-          const data = await videoRes.json();
-          setVideo(data);
-          setCurrentVote(data.userVote);
-          setLikeCount(data.likes);
-          setDislikeCount(data.dislikes);
-          setSubscribed(data.isSubscribed);
-        }
-
-        if (relatedRes.ok) {
-          const data = await relatedRes.json();
-          setRelated(data.videos || []);
-        }
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    fetchVideo();
-  }, [videoId]);
-
-  async function handleVote(type: "LIKE" | "DISLIKE") {
-    if (!video) return;
-    const prevVote = currentVote;
-    const prevLikes = likeCount;
-    const prevDislikes = dislikeCount;
-
-    if (currentVote === type) {
-      setCurrentVote(null);
-      if (type === "LIKE") setLikeCount((c) => c - 1);
-      else setDislikeCount((c) => c - 1);
-    } else {
-      if (currentVote === "LIKE") setLikeCount((c) => c - 1);
-      if (currentVote === "DISLIKE") setDislikeCount((c) => c - 1);
-      setCurrentVote(type);
-      if (type === "LIKE") setLikeCount((c) => c + 1);
-      else setDislikeCount((c) => c + 1);
-    }
-
-    try {
-      const res = await fetch("/api/likes", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ videoId: video.id, type }),
-      });
-      if (!res.ok) throw new Error();
-    } catch {
-      setCurrentVote(prevVote);
-      setLikeCount(prevLikes);
-      setDislikeCount(prevDislikes);
-    }
-  }
-
-  async function handleSubscribe() {
-    if (!video) return;
-    const prev = subscribed;
-    setSubscribed(!subscribed);
-
-    try {
-      if (prev) {
-        await fetch(`/api/subscriptions/${video.owner.id}`, { method: "DELETE" });
-      } else {
-        await fetch("/api/subscriptions", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ channelId: video.owner.id }),
-        });
-      }
-    } catch {
-      setSubscribed(prev);
-    }
-  }
-
-  if (loading) {
-    return (
-      <div className="max-w-350 mx-auto">
-        <div className="flex flex-col lg:flex-row gap-6">
-          <div className="flex-1 space-y-4">
-            <div className="aspect-video skeleton rounded-lg" />
-            <div className="h-6 skeleton w-3/4" />
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full skeleton" />
-              <div className="space-y-2 flex-1">
-                <div className="h-4 skeleton w-32" />
-                <div className="h-3 skeleton w-20" />
-              </div>
-            </div>
-          </div>
-          <div className="w-full lg:w-90 space-y-4">
-            {[1, 2, 3, 4].map((i) => (
-              <div key={i} className="flex gap-3">
-                <div className="w-40 aspect-video skeleton rounded-md shrink-0" />
-                <div className="flex-1 space-y-2">
-                  <div className="h-3 skeleton w-full" />
-                  <div className="h-3 skeleton w-2/3" />
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  if (!video) {
-    return (
-      <div className="flex flex-col items-center justify-center py-24">
-        <p className="text-sm text-text-secondary font-medium">Video not found</p>
-        <Link href="/" className="text-xs text-accent-text hover:text-accent mt-2 transition-base">
-          Back to home
-        </Link>
-      </div>
-    );
-  }
+  const liked = likes?.liked ?? false;
+  const disliked = likes?.disliked ?? false;
+  const likeCount = likes?.likeCount ?? 0;
+  const subscribed = subData?.subscribed ?? false;
 
   return (
     <div className="max-w-350 mx-auto">
@@ -257,7 +135,7 @@ export default function WatchView({ videoId }: WatchViewProps) {
                 </p>
               </div>
               <button
-                onClick={handleSubscribe}
+                onClick={() => subscribeMutation.mutate(!subscribed)}
                 className={`ml-2 inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-medium transition-base active:scale-[0.98] ${
                   subscribed
                     ? "bg-surface-hover text-text-secondary border border-border hover:bg-border"
@@ -282,26 +160,26 @@ export default function WatchView({ videoId }: WatchViewProps) {
             <div className="flex items-center gap-2">
               <div className="inline-flex items-center border border-border rounded-full overflow-hidden">
                 <button
-                  onClick={() => handleVote("LIKE")}
+                  onClick={() => likeMutation.mutate("LIKE")}
                   className={`inline-flex items-center gap-1.5 px-4 py-1.5 text-xs font-medium transition-base ${
-                    currentVote === "LIKE"
+                    liked
                       ? "bg-accent-subtle text-accent-text"
                       : "text-text-secondary hover:bg-surface-hover"
                   }`}
                 >
-                  <ThumbsUpIcon size={16} weight={currentVote === "LIKE" ? "fill" : "regular"} />
+                  <ThumbsUpIcon size={16} weight={liked ? "fill" : "regular"} />
                   <span className="font-mono">{likeCount}</span>
                 </button>
                 <div className="w-px h-6 bg-border" />
                 <button
-                  onClick={() => handleVote("DISLIKE")}
+                  onClick={() => likeMutation.mutate("DISLIKE")}
                   className={`inline-flex items-center gap-1 px-3 py-1.5 text-xs transition-base ${
-                    currentVote === "DISLIKE"
+                    disliked
                       ? "bg-danger-subtle text-danger-text"
                       : "text-text-secondary hover:bg-surface-hover"
                   }`}
                 >
-                  <ThumbsDownIcon size={16} weight={currentVote === "DISLIKE" ? "fill" : "regular"} />
+                  <ThumbsDownIcon size={16} weight={disliked ? "fill" : "regular"} />
                 </button>
               </div>
 
@@ -360,7 +238,7 @@ export default function WatchView({ videoId }: WatchViewProps) {
 
           {/* Comments */}
           <div className="mt-8 border-t border-border pt-6">
-            <CommentList videoId={videoId} />
+            <CommentList videoId={video.id} />
           </div>
         </div>
 
