@@ -2,7 +2,9 @@
 
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import Image from "next/image";
+import { usePathname, useRouter } from "next/navigation";
+import { useSession, signOut } from "next-auth/react";
 import {
   MagnifyingGlassIcon,
   VideoCameraIcon,
@@ -10,6 +12,7 @@ import {
   UserCircleIcon,
   ListIcon,
   SignOutIcon,
+  SignInIcon,
   GearIcon,
   XIcon,
 } from "@phosphor-icons/react";
@@ -20,11 +23,15 @@ interface NavbarProps {
 
 export default function Navbar({ onToggleSidebar }: NavbarProps) {
   const pathname = usePathname();
+  const router = useRouter();
+  const { data: session } = useSession();
   const [searchQuery, setSearchQuery] = useState("");
   const [searchFocused, setSearchFocused] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
   const profileRef = useRef<HTMLDivElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
+
+  const user = session?.user;
 
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
@@ -39,7 +46,7 @@ export default function Navbar({ onToggleSidebar }: NavbarProps) {
   function handleSearch(e: React.FormEvent) {
     e.preventDefault();
     if (searchQuery.trim()) {
-      window.location.href = `/search?q=${encodeURIComponent(searchQuery.trim())}`;
+      router.push(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
     }
   }
 
@@ -123,13 +130,14 @@ export default function Navbar({ onToggleSidebar }: NavbarProps) {
           <VideoCameraIcon size={20} weight="bold" />
         </Link>
 
-        <button
-          className="p-2 rounded-lg hover:bg-surface-hover transition-base focus-ring relative text-text-secondary"
-          aria-label="Notifications"
-        >
-          <BellIcon size={20} weight="bold" />
-          <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-accent rounded-full" />
-        </button>
+        {user && (
+          <button
+            className="p-2 rounded-lg hover:bg-surface-hover transition-base focus-ring relative text-text-secondary"
+            aria-label="Notifications"
+          >
+            <BellIcon size={20} weight="bold" />
+          </button>
+        )}
 
         {/* Profile dropdown */}
         <div ref={profileRef} className="relative">
@@ -138,35 +146,88 @@ export default function Navbar({ onToggleSidebar }: NavbarProps) {
             className="p-1.5 rounded-lg hover:bg-surface-hover transition-base focus-ring"
             aria-label="Account menu"
           >
-            <div className="w-7 h-7 rounded-full bg-surface-hover border border-border flex items-center justify-center">
-              <UserCircleIcon size={20} weight="fill" className="text-text-tertiary" />
-            </div>
+            {user?.image ? (
+              <Image
+                src={user.image}
+                alt={user.name || "Profile"}
+                width={28}
+                height={28}
+                className="w-7 h-7 rounded-full object-cover border border-border"
+              />
+            ) : (
+              <div className="w-7 h-7 rounded-full bg-surface-hover border border-border flex items-center justify-center">
+                {user ? (
+                  <span className="text-xs font-medium text-text-secondary">
+                    {user.name?.charAt(0)?.toUpperCase() || "U"}
+                  </span>
+                ) : (
+                  <UserCircleIcon size={20} weight="fill" className="text-text-tertiary" />
+                )}
+              </div>
+            )}
           </button>
 
           {profileOpen && (
             <div className="absolute right-0 top-full mt-2 w-56 bg-surface border border-border rounded-lg shadow-[0_4px_16px_rgba(0,0,0,0.06)] py-1 z-50">
               <div className="px-4 py-3 border-b border-border">
-                <p className="text-sm font-medium text-text-primary truncate">Guest User</p>
-                <p className="text-xs text-text-secondary mt-0.5">Sign in to access all features</p>
+                {user ? (
+                  <>
+                    <p className="text-sm font-medium text-text-primary truncate">
+                      {user.name || "User"}
+                    </p>
+                    <p className="text-xs text-text-secondary mt-0.5 truncate">
+                      {user.email}
+                    </p>
+                  </>
+                ) : (
+                  <>
+                    <p className="text-sm font-medium text-text-primary truncate">Guest</p>
+                    <p className="text-xs text-text-secondary mt-0.5">Sign in to access all features</p>
+                  </>
+                )}
               </div>
 
               <div className="py-1">
-                <Link
-                  href="/settings"
-                  onClick={() => setProfileOpen(false)}
-                  className="flex items-center gap-3 px-4 py-2 text-sm text-text-secondary hover:bg-surface-hover transition-base"
-                >
-                  <GearIcon size={16} />
-                  <span>Settings</span>
-                </Link>
-                <Link
-                  href="/signin"
-                  onClick={() => setProfileOpen(false)}
-                  className="flex items-center gap-3 px-4 py-2 text-sm text-text-secondary hover:bg-surface-hover transition-base"
-                >
-                  <SignOutIcon size={16} />
-                  <span>Sign in</span>
-                </Link>
+                {user && (
+                  <>
+                    <Link
+                      href={`/channel/${user.id}`}
+                      onClick={() => setProfileOpen(false)}
+                      className="flex items-center gap-3 px-4 py-2 text-sm text-text-secondary hover:bg-surface-hover transition-base"
+                    >
+                      <UserCircleIcon size={16} />
+                      <span>Your channel</span>
+                    </Link>
+                    <Link
+                      href="/settings"
+                      onClick={() => setProfileOpen(false)}
+                      className="flex items-center gap-3 px-4 py-2 text-sm text-text-secondary hover:bg-surface-hover transition-base"
+                    >
+                      <GearIcon size={16} />
+                      <span>Settings</span>
+                    </Link>
+                    <button
+                      onClick={() => {
+                        setProfileOpen(false);
+                        signOut({ callbackUrl: "/" });
+                      }}
+                      className="flex items-center gap-3 px-4 py-2 text-sm text-text-secondary hover:bg-surface-hover transition-base w-full text-left"
+                    >
+                      <SignOutIcon size={16} />
+                      <span>Sign out</span>
+                    </button>
+                  </>
+                )}
+                {!user && (
+                  <Link
+                    href={`/signin?callbackUrl=${encodeURIComponent(pathname)}`}
+                    onClick={() => setProfileOpen(false)}
+                    className="flex items-center gap-3 px-4 py-2 text-sm text-text-secondary hover:bg-surface-hover transition-base"
+                  >
+                    <SignInIcon size={16} />
+                    <span>Sign in</span>
+                  </Link>
+                )}
               </div>
             </div>
           )}

@@ -1,7 +1,9 @@
 "use client";
 
 import { useState, useRef } from "react";
+import Image from "next/image";
 import { PaperPlaneRightIcon } from "@phosphor-icons/react";
+import { useRequireAuth } from "@/hooks/useRequireAuth";
 
 interface CommentFormProps {
   videoId: string;
@@ -20,6 +22,8 @@ export default function CommentForm({
   onSubmit,
   onCancel,
 }: CommentFormProps) {
+  const { session, requireAuth } = useRequireAuth();
+  const user = session?.user;
   const [body, setBody] = useState("");
   const [focused, setFocused] = useState(autoFocus);
   const [submitting, setSubmitting] = useState(false);
@@ -29,6 +33,10 @@ export default function CommentForm({
     e.preventDefault();
     if (!body.trim() || submitting) return;
 
+    requireAuth(() => doSubmit());
+  }
+
+  async function doSubmit() {
     setSubmitting(true);
     try {
       const res = await fetch("/api/comments", {
@@ -61,11 +69,23 @@ export default function CommentForm({
   return (
     <form onSubmit={handleSubmit} className="w-full">
       <div className="flex gap-3">
-        {/* Avatar placeholder */}
+        {/* Avatar */}
         <div className="shrink-0 mt-1">
-          <div className="w-8 h-8 rounded-full bg-surface-hover border border-border flex items-center justify-center">
-            <span className="text-xs font-medium text-text-tertiary">G</span>
-          </div>
+          {user?.image ? (
+            <Image
+              src={user.image}
+              alt={user.name || "You"}
+              width={32}
+              height={32}
+              className="w-8 h-8 rounded-full object-cover border border-border"
+            />
+          ) : (
+            <div className="w-8 h-8 rounded-full bg-surface-hover border border-border flex items-center justify-center">
+              <span className="text-xs font-medium text-text-tertiary">
+                {user?.name?.charAt(0)?.toUpperCase() || "?"}
+              </span>
+            </div>
+          )}
         </div>
 
         <div className="flex-1">

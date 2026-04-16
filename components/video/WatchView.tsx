@@ -16,6 +16,7 @@ import VideoPlayer from "./VideoPlayer";
 import CommentList from "@/components/comment/CommentList";
 import { useLikes, useLikeMutation } from "@/hooks/useLike";
 import { useSubscription, useSubscribeMutation } from "@/hooks/useSubscription";
+import { useRequireAuth } from "@/hooks/useRequireAuth";
 
 interface VideoOwner {
   id: string;
@@ -78,6 +79,7 @@ function formatSubscribers(count: number): string {
 
 export default function WatchView({ video, related }: WatchViewProps) {
   const [descExpanded, setDescExpanded] = useState(false);
+  const { requireAuth } = useRequireAuth();
 
   const { data: likes } = useLikes({ videoId: video.id });
   const likeMutation = useLikeMutation({ videoId: video.id });
@@ -135,7 +137,7 @@ export default function WatchView({ video, related }: WatchViewProps) {
                 </p>
               </div>
               <button
-                onClick={() => subscribeMutation.mutate(!subscribed)}
+                onClick={() => requireAuth(() => subscribeMutation.mutate(!subscribed))}
                 className={`ml-2 inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-medium transition-base active:scale-[0.98] ${
                   subscribed
                     ? "bg-surface-hover text-text-secondary border border-border hover:bg-border"
@@ -160,7 +162,7 @@ export default function WatchView({ video, related }: WatchViewProps) {
             <div className="flex items-center gap-2">
               <div className="inline-flex items-center border border-border rounded-full overflow-hidden">
                 <button
-                  onClick={() => likeMutation.mutate("LIKE")}
+                  onClick={() => requireAuth(() => likeMutation.mutate("LIKE"))}
                   className={`inline-flex items-center gap-1.5 px-4 py-1.5 text-xs font-medium transition-base ${
                     liked
                       ? "bg-accent-subtle text-accent-text"
@@ -172,7 +174,7 @@ export default function WatchView({ video, related }: WatchViewProps) {
                 </button>
                 <div className="w-px h-6 bg-border" />
                 <button
-                  onClick={() => likeMutation.mutate("DISLIKE")}
+                  onClick={() => requireAuth(() => likeMutation.mutate("DISLIKE"))}
                   className={`inline-flex items-center gap-1 px-3 py-1.5 text-xs transition-base ${
                     disliked
                       ? "bg-danger-subtle text-danger-text"
