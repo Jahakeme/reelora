@@ -12,6 +12,7 @@ import {
   SkipForwardIcon,
   SkipBackIcon,
 } from "@phosphor-icons/react";
+import { usePlayerStore } from "@/stores/player";
 
 interface VideoPlayerProps {
   src: string;
@@ -36,9 +37,9 @@ export default function VideoPlayer({ src, poster, title }: VideoPlayerProps) {
   const progressRef = useRef<HTMLDivElement>(null);
   const hideControlsTimer = useRef<ReturnType<typeof setTimeout>>(null);
 
+  const { volume, muted, setVolume: storeSetVolume, toggleMute: storeToggleMute } = usePlayerStore();
+
   const [playing, setPlaying] = useState(false);
-  const [muted, setMuted] = useState(false);
-  const [volume, setVolume] = useState(1);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [buffered, setBuffered] = useState(0);
@@ -61,18 +62,17 @@ export default function VideoPlayer({ src, poster, title }: VideoPlayerProps) {
   const toggleMute = useCallback(() => {
     const video = videoRef.current;
     if (!video) return;
-    video.muted = !video.muted;
-    setMuted(video.muted);
-  }, []);
+    video.muted = !muted;
+    storeToggleMute();
+  }, [muted, storeToggleMute]);
 
   const handleVolumeChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const video = videoRef.current;
     if (!video) return;
     const val = parseFloat(e.target.value);
     video.volume = val;
-    setVolume(val);
-    setMuted(val === 0);
-  }, []);
+    storeSetVolume(val);
+  }, [storeSetVolume]);
 
   const toggleFullscreen = useCallback(() => {
     const container = containerRef.current;
@@ -109,6 +109,13 @@ export default function VideoPlayer({ src, poster, title }: VideoPlayerProps) {
       hideControlsTimer.current = setTimeout(() => setShowControls(false), 3000);
     }
   }, [playing]);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+    video.volume = volume;
+    video.muted = muted;
+  }, []);
 
   useEffect(() => {
     const video = videoRef.current;
