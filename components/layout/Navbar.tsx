@@ -10,18 +10,13 @@ import {
   VideoCameraIcon,
   BellIcon,
   UserCircleIcon,
-  ListIcon,
   SignOutIcon,
   SignInIcon,
   GearIcon,
   XIcon,
 } from "@phosphor-icons/react";
 
-interface NavbarProps {
-  onToggleSidebar: () => void;
-}
-
-export default function Navbar({ onToggleSidebar }: NavbarProps) {
+export default function Navbar() {
   const pathname = usePathname();
   const router = useRouter();
   const { data: session } = useSession();
@@ -54,16 +49,8 @@ export default function Navbar({ onToggleSidebar }: NavbarProps) {
 
   return (
     <nav style={{ viewTransitionName: "persistent-nav" }} className="fixed top-0 left-0 right-0 z-40 h-(--navbar-height) bg-surface border-b border-border flex items-center px-4 gap-4">
-      {/* Left: Hamburger + Logo */}
+      {/* Left: Logo */}
       <div className="flex items-center gap-3 shrink-0">
-        <button
-          onClick={onToggleSidebar}
-          className="p-2 rounded-lg hover:bg-surface-hover transition-base focus-ring"
-          aria-label="Toggle sidebar"
-        >
-          <ListIcon size={20} weight="bold" className="text-text-primary" />
-        </button>
-
         <Link href="/" className="flex items-center gap-2 group">
           <div className="w-7 h-7 rounded-md bg-text-primary flex items-center justify-center">
             <span className="text-surface text-xs font-bold tracking-tight">R</span>

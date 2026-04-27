@@ -13,11 +13,9 @@ import {
   GameControllerIcon,
   NewspaperIcon,
   TrophyIcon,
+  ListIcon,
 } from "@phosphor-icons/react";
-
-interface SidebarProps {
-  isOpen: boolean;
-}
+import { useSidebarStore } from "@/stores/sidebar";
 
 const mainLinks = [
   { href: "/", label: "Home", icon: HouseIcon },
@@ -38,86 +36,136 @@ const categoryLinks = [
   { href: "/sports", label: "Sports", icon: TrophyIcon },
 ];
 
-export default function Sidebar({ isOpen }: SidebarProps) {
-  const pathname = usePathname();
+type NavLinkItem = {
+  href: string;
+  label: string;
+  icon: React.ComponentType<{ size?: number; weight?: "bold" | "fill" | "regular" }>;
+};
 
-  function NavLink({
-    href,
-    label,
-    icon: Icon,
-  }: {
-    href: string;
-    label: string;
-    icon: React.ComponentType<{ size?: number; weight?: "bold" | "fill" | "regular" }>;
-  }) {
-    const active = pathname === href;
-    return (
-      <Link
-        href={href}
-        className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-base ${
-          active
-            ? "bg-surface-hover text-text-primary font-medium"
-            : "text-text-secondary hover:bg-surface-hover hover:text-text-primary"
-        }`}
-      >
-        <Icon size={18} weight={active ? "fill" : "regular"} />
-        {isOpen && <span className="truncate">{label}</span>}
-      </Link>
-    );
+function NavLink({
+  item,
+  active,
+  collapseClass,
+  onNavigate,
+}: {
+  item: NavLinkItem;
+  active: boolean;
+  collapseClass: string;
+  onNavigate: () => void;
+}) {
+  const Icon = item.icon;
+  return (
+    <Link
+      href={item.href}
+      onClick={onNavigate}
+      className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-base ${
+        active
+          ? "bg-surface-hover text-text-primary font-medium"
+          : "text-text-secondary hover:bg-surface-hover hover:text-text-primary"
+      }`}
+    >
+      <Icon size={18} weight={active ? "fill" : "regular"} />
+      <span className={`truncate ${collapseClass}`}>{item.label}</span>
+    </Link>
+  );
+}
+
+export default function Sidebar() {
+  const pathname = usePathname();
+  const isOpen = useSidebarStore((s) => s.isOpen);
+  const toggle = useSidebarStore((s) => s.toggle);
+  const mobileDrawerOpen = useSidebarStore((s) => s.mobileDrawerOpen);
+  const setMobileDrawerOpen = useSidebarStore((s) => s.setMobileDrawerOpen);
+
+  // Labels/sections collapse only on desktop when the rail is collapsed.
+  // On mobile (drawer view), the full expanded layout is always rendered.
+  const collapseClass = isOpen ? "" : "md:hidden";
+
+  function handleToggleClick() {
+    if (mobileDrawerOpen) setMobileDrawerOpen(false);
+    else toggle();
+  }
+
+  function handleNavigate() {
+    setMobileDrawerOpen(false);
   }
 
   return (
     <aside
       style={{ viewTransitionName: "persistent-sidebar" }}
-      className={`fixed left-0 top-(--navbar-height) bottom-0 z-30 bg-surface border-r border-border transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] overflow-y-auto overflow-x-hidden ${
-        isOpen ? "w-(--sidebar-width)" : "w-16"
+      className={`fixed left-0 top-(--navbar-height) bottom-0 z-30 bg-surface border-r border-border transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] overflow-y-auto overflow-x-hidden w-(--sidebar-width) ${
+        mobileDrawerOpen ? "translate-x-0 shadow-2xl" : "-translate-x-full"
+      } md:translate-x-0 md:shadow-none ${
+        isOpen ? "md:w-(--sidebar-width)" : "md:w-16"
       }`}
     >
       <div className="flex flex-col p-2 gap-0.5">
+        {/* Toggle */}
+        <button
+          onClick={handleToggleClick}
+          className="flex items-center gap-3 px-3 py-2 rounded-lg text-text-primary hover:bg-surface-hover transition-base focus-ring mb-1"
+          aria-label="Toggle sidebar"
+        >
+          <ListIcon size={18} weight="bold" />
+          <span className={`text-sm ${collapseClass}`}>Menu</span>
+        </button>
+
         {/* Main */}
         <div className="mb-2">
-          {mainLinks.map((link) => (
-            <NavLink key={link.href} {...link} />
+          {mainLinks.map((item) => (
+            <NavLink
+              key={item.href}
+              item={item}
+              active={pathname === item.href}
+              collapseClass={collapseClass}
+              onNavigate={handleNavigate}
+            />
           ))}
         </div>
 
         {/* Library */}
-        {isOpen && (
-          <div className="pt-3 border-t border-border">
-            <p className="px-3 py-1.5 text-xs font-medium text-text-tertiary uppercase tracking-wider">
-              Library
-            </p>
-          </div>
-        )}
+        <div className={`pt-3 border-t border-border ${collapseClass}`}>
+          <p className="px-3 py-1.5 text-xs font-medium text-text-tertiary uppercase tracking-wider">
+            Library
+          </p>
+        </div>
         <div className="mb-2">
-          {libraryLinks.map((link) => (
-            <NavLink key={link.href} {...link} />
+          {libraryLinks.map((item) => (
+            <NavLink
+              key={item.href}
+              item={item}
+              active={pathname === item.href}
+              collapseClass={collapseClass}
+              onNavigate={handleNavigate}
+            />
           ))}
         </div>
 
         {/* Categories */}
-        {isOpen && (
-          <div className="pt-3 border-t border-border">
-            <p className="px-3 py-1.5 text-xs font-medium text-text-tertiary uppercase tracking-wider">
-              Categories
-            </p>
-          </div>
-        )}
+        <div className={`pt-3 border-t border-border ${collapseClass}`}>
+          <p className="px-3 py-1.5 text-xs font-medium text-text-tertiary uppercase tracking-wider">
+            Categories
+          </p>
+        </div>
         <div>
-          {categoryLinks.map((link) => (
-            <NavLink key={link.href} {...link} />
+          {categoryLinks.map((item) => (
+            <NavLink
+              key={item.href}
+              item={item}
+              active={pathname === item.href}
+              collapseClass={collapseClass}
+              onNavigate={handleNavigate}
+            />
           ))}
         </div>
 
         {/* Footer */}
-        {isOpen && (
-          <div className="mt-6 px-3 py-4 border-t border-border">
-            <p className="text-xs text-text-tertiary leading-relaxed">
-              About &middot; Press &middot; Copyright &middot; Contact &middot; Creators
-            </p>
-            <p className="text-xs text-text-tertiary mt-2 font-mono">Reelora 2026</p>
-          </div>
-        )}
+        <div className={`mt-6 px-3 py-4 border-t border-border ${collapseClass}`}>
+          <p className="text-xs text-text-tertiary leading-relaxed">
+            About &middot; Press &middot; Copyright &middot; Contact &middot; Creators
+          </p>
+          <p className="text-xs text-text-tertiary mt-2 font-mono">Reelora 2026</p>
+        </div>
       </div>
     </aside>
   );

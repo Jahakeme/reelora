@@ -76,93 +76,97 @@ export default function VideoCard({
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+      className="group"
     >
-      <Link href={`/watch/${id}`} transitionTypes={["nav-forward"]} className="group block">
-        {/* Thumbnail */}
-        <div className="relative aspect-video rounded-lg overflow-hidden bg-surface-hover mb-3">
-          {thumbnail ? (
-            <>
-              {!imageLoaded && <div className="absolute inset-0 skeleton" />}
-              <Image
-                src={toCloudinaryThumbnail(thumbnail)!}
-                alt={title}
-                fill
-                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-                className={`object-cover transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.03] ${
-                  imageLoaded ? "opacity-100" : "opacity-0"
-                }`}
-                onLoad={() => setImageLoaded(true)}
-              />
-            </>
+      {/* Thumbnail */}
+      <Link
+        href={`/watch/${id}`}
+        transitionTypes={["nav-forward"]}
+        className="block relative aspect-video rounded-lg overflow-hidden bg-surface-hover mb-3"
+      >
+        {thumbnail ? (
+          <>
+            {!imageLoaded && <div className="absolute inset-0 skeleton" />}
+            <Image
+              src={toCloudinaryThumbnail(thumbnail)!}
+              alt={title}
+              fill
+              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+              className={`object-cover transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.03] ${
+                imageLoaded ? "opacity-100" : "opacity-0"
+              }`}
+              onLoad={() => setImageLoaded(true)}
+            />
+          </>
+        ) : (
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div className="w-12 h-12 rounded-lg bg-border flex items-center justify-center">
+              <EyeIcon size={20} className="text-text-tertiary" />
+            </div>
+          </div>
+        )}
+
+        {/* Duration badge */}
+        {duration !== null ? (
+          <div className="absolute bottom-2 right-2 px-1.5 py-0.5 bg-text-primary/80 text-surface text-xs font-mono rounded">
+            {formatDuration(duration)}
+          </div>
+        ) : null}
+
+        {/* Hover overlay */}
+        <div className="absolute inset-0 bg-text-primary/0 group-hover:bg-text-primary/5 transition-colors duration-200" />
+      </Link>
+
+      {/* Info */}
+      <div className="flex gap-3">
+        {/* Channel avatar */}
+        <Link href={`/channel/${owner.id}`} className="shrink-0 mt-0.5">
+          {owner.image ? (
+            <Image
+              src={owner.image}
+              alt={owner.name || "Channel"}
+              width={32}
+              height={32}
+              className="w-8 h-8 rounded-full object-cover border border-border"
+            />
           ) : (
-            <div className="absolute inset-0 flex items-center justify-center">
-              <div className="w-12 h-12 rounded-lg bg-border flex items-center justify-center">
-                <EyeIcon size={20} className="text-text-tertiary" />
-              </div>
+            <div className="w-8 h-8 rounded-full bg-surface-hover border border-border flex items-center justify-center">
+              <span className="text-xs font-medium text-text-secondary">
+                {owner.name?.charAt(0)?.toUpperCase() || "?"}
+              </span>
             </div>
           )}
+        </Link>
 
-          {/* Duration badge */}
-          {duration !== null && (
-            <div className="absolute bottom-2 right-2 px-1.5 py-0.5 bg-text-primary/80 text-surface text-xs font-mono rounded">
-              {formatDuration(duration)}
-            </div>
-          )}
-
-          {/* Hover overlay */}
-          <div className="absolute inset-0 bg-text-primary/0 group-hover:bg-text-primary/5 transition-colors duration-200" />
-        </div>
-
-        {/* Info */}
-        <div className="flex gap-3">
-          {/* Channel avatar */}
+        <div className="min-w-0 flex-1">
           <Link
-            href={`/channel/${owner.id}`}
-            onClick={(e) => e.stopPropagation()}
-            className="shrink-0 mt-0.5"
+            href={`/watch/${id}`}
+            transitionTypes={["nav-forward"]}
+            className="block"
           >
-            {owner.image ? (
-              <Image
-                src={owner.image}
-                alt={owner.name || "Channel"}
-                width={32}
-                height={32}
-                className="w-8 h-8 rounded-full object-cover border border-border"
-              />
-            ) : (
-              <div className="w-8 h-8 rounded-full bg-surface-hover border border-border flex items-center justify-center">
-                <span className="text-xs font-medium text-text-secondary">
-                  {owner.name?.charAt(0)?.toUpperCase() || "?"}
-                </span>
-              </div>
-            )}
-          </Link>
-
-          <div className="min-w-0 flex-1">
             <h3 className="text-sm font-medium text-text-primary leading-snug line-clamp-2 group-hover:text-accent-text transition-colors">
               {title}
             </h3>
-            <Link
-              href={`/channel/${owner.id}`}
-              onClick={(e) => e.stopPropagation()}
-              className="text-xs text-text-secondary hover:text-text-primary transition-base mt-1 block truncate"
-            >
-              {owner.name || "Unknown"}
-            </Link>
-            <div className="flex items-center gap-1.5 mt-0.5 text-xs text-text-tertiary">
-              <span className="flex items-center gap-1">
-                <EyeIcon size={12} />
-                {formatViews(views)}
-              </span>
-              <span>&middot;</span>
-              <span className="flex items-center gap-1">
-                <ClockIcon size={12} />
-                {formatTimeAgo(createdAt)}
-              </span>
-            </div>
+          </Link>
+          <Link
+            href={`/channel/${owner.id}`}
+            className="text-xs text-text-secondary hover:text-text-primary transition-base mt-1 block truncate"
+          >
+            {owner.name || "Unknown"}
+          </Link>
+          <div className="flex items-center gap-1.5 mt-0.5 text-xs text-text-tertiary">
+            <span className="flex items-center gap-1">
+              <EyeIcon size={12} />
+              {formatViews(views)}
+            </span>
+            <span>&middot;</span>
+            <span className="flex items-center gap-1">
+              <ClockIcon size={12} />
+              {formatTimeAgo(createdAt)}
+            </span>
           </div>
         </div>
-      </Link>
+      </div>
     </motion.article>
   );
 }
