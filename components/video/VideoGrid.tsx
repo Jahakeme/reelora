@@ -37,13 +37,13 @@ export default function VideoGrid({ videos, columns = "default" }: VideoGridProp
   if (videos.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-20 px-4">
-        <div className="w-16 h-16 rounded-2xl bg-surface-hover flex items-center justify-center mb-4">
+        <div className="w-16 h-16 rounded-2xl bg-bg-hover flex items-center justify-center mb-4">
           <svg
             width="24"
             height="24"
             viewBox="0 0 24 24"
             fill="none"
-            className="text-text-tertiary"
+            className="text-text-muted"
           >
             <path
               d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"
@@ -55,7 +55,7 @@ export default function VideoGrid({ videos, columns = "default" }: VideoGridProp
           </svg>
         </div>
         <p className="text-sm text-text-secondary font-medium">No videos yet</p>
-        <p className="text-xs text-text-tertiary mt-1">Videos will appear here once published</p>
+        <p className="text-xs text-text-muted mt-1">Videos will appear here once published</p>
       </div>
     );
   }

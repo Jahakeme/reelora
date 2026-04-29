@@ -9,7 +9,7 @@ interface WatchPosterShellProps {
 export default function WatchPosterShell({ thumbnail, title }: WatchPosterShellProps) {
   const src = toCloudinaryThumbnail(thumbnail);
   if (!src) {
-    return <div className="absolute inset-0 bg-text-primary" aria-hidden />;
+    return <div className="absolute inset-0 bg-bg-base" aria-hidden />;
   }
   return (
     <Image

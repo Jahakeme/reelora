@@ -12,7 +12,7 @@ export default function MainShell({ children }: { children: React.ReactNode }) {
   const setMobileDrawerOpen = useSidebarStore((s) => s.setMobileDrawerOpen);
 
   return (
-    <div className="min-h-dvh bg-background">
+    <div className="min-h-dvh bg-bg-base">
       <Navbar />
       <Sidebar />
       <MobileSidebarTrigger />
@@ -22,7 +22,7 @@ export default function MainShell({ children }: { children: React.ReactNode }) {
           type="button"
           aria-label="Close menu"
           onClick={() => setMobileDrawerOpen(false)}
-          className="md:hidden fixed inset-0 top-(--navbar-height) z-20 bg-black/40 backdrop-blur-[2px]"
+          className="md:hidden fixed inset-0 top-(--navbar-height) z-20 bg-bg-base/60 backdrop-blur-md"
         />
       ) : null}
 

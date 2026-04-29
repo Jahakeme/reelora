@@ -77,11 +77,11 @@ export default function CommentForm({
               alt={user.name || "You"}
               width={32}
               height={32}
-              className="w-8 h-8 rounded-full object-cover border border-border"
+              className="w-8 h-8 rounded-full object-cover border border-border-default"
             />
           ) : (
-            <div className="w-8 h-8 rounded-full bg-surface-hover border border-border flex items-center justify-center">
-              <span className="text-xs font-medium text-text-tertiary">
+            <div className="w-8 h-8 rounded-full bg-bg-hover border border-border-default flex items-center justify-center">
+              <span className="text-xs font-medium text-text-muted">
                 {user?.name?.charAt(0)?.toUpperCase() || "?"}
               </span>
             </div>
@@ -97,27 +97,27 @@ export default function CommentForm({
             placeholder={placeholder}
             rows={focused ? 3 : 1}
             maxLength={1000}
-            className="w-full bg-transparent border-b border-border px-0 py-2 text-sm text-text-primary placeholder:text-text-tertiary focus:outline-none focus:border-accent transition-base resize-none"
+            className="w-full bg-transparent border-b border-border-default px-0 py-2 text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:border-amber-500 transition-base resize-none"
             autoFocus={autoFocus}
           />
 
           {focused && (
             <div className="flex items-center justify-between mt-2">
-              <span className="text-xs text-text-tertiary font-mono">
+              <span className="text-xs text-text-muted font-mono">
                 {body.length}/1000
               </span>
               <div className="flex items-center gap-2">
                 <button
                   type="button"
                   onClick={handleCancel}
-                  className="px-3 py-1.5 text-xs font-medium text-text-secondary hover:text-text-primary hover:bg-surface-hover rounded-md transition-base"
+                  className="px-3 py-1.5 text-xs font-medium text-text-secondary hover:text-text-primary hover:bg-bg-hover rounded-md transition-base"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={!body.trim() || submitting}
-                  className="inline-flex items-center gap-1.5 px-4 py-1.5 bg-text-primary text-surface text-xs font-medium rounded-md hover:bg-[#333333] active:scale-[0.98] transition-base disabled:opacity-40 disabled:cursor-not-allowed"
+                  className="inline-flex items-center gap-1.5 px-4 py-1.5 bg-amber-500 text-text-inverse text-xs font-medium rounded-md hover:bg-amber-300 active:scale-[0.98] transition-base disabled:opacity-40 disabled:cursor-not-allowed"
                 >
                   <PaperPlaneRightIcon size={12} weight="bold" />
                   {parentId ? "Reply" : "Comment"}

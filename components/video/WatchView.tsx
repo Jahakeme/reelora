@@ -101,7 +101,7 @@ export default function WatchView({ video, related, poster }: WatchViewProps) {
         {/* Main column */}
         <div className="flex-1 min-w-0">
           {/* Player — server-rendered poster shell underneath, video player overlays */}
-          <div className="relative w-full aspect-video rounded-lg overflow-hidden bg-text-primary">
+          <div className="relative w-full aspect-video rounded-lg overflow-hidden bg-bg-base">
             <div
               className={`absolute inset-0 pointer-events-none transition-opacity duration-300 ${
                 playing ? "opacity-0" : "opacity-100"
@@ -134,10 +134,10 @@ export default function WatchView({ video, related, poster }: WatchViewProps) {
                     alt={video.owner.name || "Channel"}
                     width={40}
                     height={40}
-                    className="w-10 h-10 rounded-full object-cover border border-border"
+                    className="w-10 h-10 rounded-full object-cover border border-border-default"
                   />
                 ) : (
-                  <div className="w-10 h-10 rounded-full bg-surface-hover border border-border flex items-center justify-center">
+                  <div className="w-10 h-10 rounded-full bg-bg-hover border border-border-default flex items-center justify-center">
                     <span className="text-sm font-medium text-text-secondary">
                       {video.owner.name?.charAt(0)?.toUpperCase() || "?"}
                     </span>
@@ -151,7 +151,7 @@ export default function WatchView({ video, related, poster }: WatchViewProps) {
                 >
                   {video.owner.name || "Unknown"}
                 </Link>
-                <p className="text-xs text-text-tertiary">
+                <p className="text-xs text-text-muted">
                   {formatSubscribers(video.owner.subscriberCount)} subscribers
                 </p>
               </div>
@@ -160,8 +160,8 @@ export default function WatchView({ video, related, poster }: WatchViewProps) {
                   onClick={() => requireAuth(() => subscribeMutation.mutate(!subscribed))}
                   className={`ml-2 inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-medium transition-base active:scale-[0.98] ${
                     subscribed
-                      ? "bg-surface-hover text-text-secondary border border-border hover:bg-border"
-                      : "bg-text-primary text-surface hover:bg-[#333333]"
+                      ? "bg-bg-hover text-text-secondary border border-border-default hover:bg-border-default"
+                      : "bg-amber-500 text-text-inverse hover:bg-amber-300"
                   }`}
                 >
                   {subscribed ? (
@@ -181,44 +181,44 @@ export default function WatchView({ video, related, poster }: WatchViewProps) {
 
             {/* Action buttons */}
             <div className="flex items-center gap-2">
-              <div className="inline-flex items-center border border-border rounded-full overflow-hidden">
+              <div className="inline-flex items-center border border-border-default rounded-full overflow-hidden">
                 <button
                   onClick={() => requireAuth(() => likeMutation.mutate("LIKE"))}
                   className={`inline-flex items-center gap-1.5 px-4 py-1.5 text-xs font-medium transition-base ${
                     liked
-                      ? "bg-accent-subtle text-accent-text"
-                      : "text-text-secondary hover:bg-surface-hover"
+                      ? "bg-amber-700 text-amber-100"
+                      : "text-text-secondary hover:bg-bg-hover"
                   }`}
                 >
                   <ThumbsUpIcon size={16} weight={liked ? "fill" : "regular"} />
                   <span className="font-mono">{likeCount}</span>
                 </button>
-                <div className="w-px h-6 bg-border" />
+                <div className="w-px h-6 bg-border-default" />
                 <button
                   onClick={() => requireAuth(() => likeMutation.mutate("DISLIKE"))}
                   className={`inline-flex items-center gap-1 px-3 py-1.5 text-xs transition-base ${
                     disliked
-                      ? "bg-danger-subtle text-danger-text"
-                      : "text-text-secondary hover:bg-surface-hover"
+                      ? "bg-vermillion-700 text-vermillion-100"
+                      : "text-text-secondary hover:bg-bg-hover"
                   }`}
                 >
                   <ThumbsDownIcon size={16} weight={disliked ? "fill" : "regular"} />
                 </button>
               </div>
 
-              <button className="inline-flex items-center gap-1.5 px-4 py-1.5 border border-border rounded-full text-xs font-medium text-text-secondary hover:bg-surface-hover transition-base">
+              <button className="inline-flex items-center gap-1.5 px-4 py-1.5 border border-border-default rounded-full text-xs font-medium text-text-secondary hover:bg-bg-hover transition-base">
                 <ShareNetworkIcon size={16} />
                 Share
               </button>
 
-              <button className="p-1.5 border border-border rounded-full text-text-secondary hover:bg-surface-hover transition-base">
+              <button className="p-1.5 border border-border-default rounded-full text-text-secondary hover:bg-bg-hover transition-base">
                 <DotsThreeIcon size={16} weight="bold" />
               </button>
             </div>
           </div>
 
           {/* Description */}
-          <div className="mt-4 p-4 bg-surface-hover rounded-xl">
+          <div className="mt-4 p-4 bg-bg-hover rounded-xl">
             <div className="flex items-center gap-3 text-xs text-text-secondary font-medium mb-2">
               <span className="flex items-center gap-1">
                 <EyeIcon size={14} />
@@ -250,7 +250,7 @@ export default function WatchView({ video, related, poster }: WatchViewProps) {
                   <Link
                     key={tag}
                     href={`/search?q=${encodeURIComponent(tag)}`}
-                    className="px-2.5 py-1 bg-accent-subtle text-accent-text text-xs font-medium rounded-full hover:bg-accent/10 transition-base"
+                    className="px-2.5 py-1 bg-amber-700 text-amber-100 text-xs font-medium rounded-full hover:bg-amber-500/10 transition-base"
                   >
                     #{tag}
                   </Link>
@@ -260,7 +260,7 @@ export default function WatchView({ video, related, poster }: WatchViewProps) {
           </div>
 
           {/* Comments */}
-          <div className="mt-8 border-t border-border pt-6">
+          <div className="mt-8 border-t border-border-default pt-6">
             <CommentList videoId={video.id} />
           </div>
         </div>
@@ -274,7 +274,7 @@ export default function WatchView({ video, related, poster }: WatchViewProps) {
             <div className="space-y-4">
               {related.map((rv) => (
                 <Link key={rv.id} href={`/watch/${rv.id}`} transitionTypes={["nav-forward"]} className="flex gap-3 group">
-                  <div className="relative w-40 shrink-0 aspect-video rounded-lg overflow-hidden bg-surface-hover">
+                  <div className="relative w-40 shrink-0 aspect-video rounded-lg overflow-hidden bg-bg-hover">
                     {rv.thumbnail ? (
                       <Image
                         src={toCloudinaryThumbnail(rv.thumbnail)!}
@@ -285,23 +285,23 @@ export default function WatchView({ video, related, poster }: WatchViewProps) {
                       />
                     ) : (
                       <div className="absolute inset-0 flex items-center justify-center">
-                        <EyeIcon size={16} className="text-text-tertiary" />
+                        <EyeIcon size={16} className="text-text-muted" />
                       </div>
                     )}
                     {rv.duration !== null && (
-                      <span className="absolute bottom-1 right-1 px-1 py-0.5 bg-text-primary/80 text-surface text-[10px] font-mono rounded">
+                      <span className="absolute bottom-1 right-1 px-1 py-0.5 bg-bg-base/80 text-text-primary text-[10px] font-mono rounded">
                         {Math.floor(rv.duration / 60)}:{(rv.duration % 60).toString().padStart(2, "0")}
                       </span>
                     )}
                   </div>
                   <div className="flex-1 min-w-0 py-0.5">
-                    <h4 className="text-sm font-medium text-text-primary leading-snug line-clamp-2 group-hover:text-accent-text transition-colors">
+                    <h4 className="text-sm font-medium text-text-primary leading-snug line-clamp-2 group-hover:text-amber-100 transition-colors">
                       {rv.title}
                     </h4>
                     <p className="text-xs text-text-secondary mt-1 truncate">
                       {rv.owner.name || "Unknown"}
                     </p>
-                    <p className="text-xs text-text-tertiary mt-0.5">
+                    <p className="text-xs text-text-muted mt-0.5">
                       {rv.views >= 1000 ? `${(rv.views / 1000).toFixed(1)}K` : rv.views} views
                     </p>
                   </div>
@@ -309,7 +309,7 @@ export default function WatchView({ video, related, poster }: WatchViewProps) {
               ))}
             </div>
           ) : (
-            <p className="text-xs text-text-tertiary">No related videos</p>
+            <p className="text-xs text-text-muted">No related videos</p>
           )}
         </aside>
       </div>

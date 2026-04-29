@@ -60,7 +60,7 @@ export default function ChannelView({ channel, videos }: ChannelViewProps) {
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-        className="flex flex-col sm:flex-row items-start sm:items-center gap-5 pb-6 border-b border-border"
+        className="flex flex-col sm:flex-row items-start sm:items-center gap-5 pb-6 border-b border-border-default"
       >
         {/* Avatar */}
         {channel.image ? (
@@ -69,10 +69,10 @@ export default function ChannelView({ channel, videos }: ChannelViewProps) {
             alt={channel.name || "Channel"}
             width={80}
             height={80}
-            className="w-20 h-20 rounded-full object-cover border border-border"
+            className="w-20 h-20 rounded-full object-cover border border-border-default"
           />
         ) : (
-          <div className="w-20 h-20 rounded-full bg-surface-hover border border-border flex items-center justify-center">
+          <div className="w-20 h-20 rounded-full bg-bg-hover border border-border-default flex items-center justify-center">
             <span className="text-2xl font-semibold text-text-secondary">
               {channel.name?.charAt(0)?.toUpperCase() || "?"}
             </span>
@@ -83,7 +83,7 @@ export default function ChannelView({ channel, videos }: ChannelViewProps) {
           <h1 className="text-xl font-semibold text-text-primary tracking-tight">
             {channel.name || "Unknown Channel"}
           </h1>
-          <div className="flex items-center gap-3 mt-1 text-xs text-text-tertiary">
+          <div className="flex items-center gap-3 mt-1 text-xs text-text-muted">
             <span className="font-mono">{formatCount(channel.subscriberCount)} subscribers</span>
             <span>&middot;</span>
             <span className="font-mono">{formatCount(channel.videoCount)} videos</span>
@@ -95,8 +95,8 @@ export default function ChannelView({ channel, videos }: ChannelViewProps) {
                 onClick={() => requireAuth(() => subscribeMutation.mutate(!subscribed))}
                 className={`inline-flex items-center gap-1.5 px-5 py-2 rounded-full text-sm font-medium transition-base active:scale-[0.98] ${
                   subscribed
-                    ? "bg-surface-hover text-text-secondary border border-border hover:bg-border"
-                    : "bg-text-primary text-surface hover:bg-[#333333]"
+                    ? "bg-bg-hover text-text-secondary border border-border-default hover:bg-border-default"
+                    : "bg-amber-500 text-text-inverse hover:bg-amber-300"
                 }`}
               >
                 {subscribed ? (
@@ -112,7 +112,7 @@ export default function ChannelView({ channel, videos }: ChannelViewProps) {
                 )}
               </button>
               {subscribed && (
-                <button className="p-2 rounded-full border border-border hover:bg-surface-hover transition-base text-text-secondary">
+                <button className="p-2 rounded-full border border-border-default hover:bg-bg-hover transition-base text-text-secondary">
                   <BellIcon size={16} />
                 </button>
               )}
@@ -122,7 +122,7 @@ export default function ChannelView({ channel, videos }: ChannelViewProps) {
       </motion.div>
 
       {/* Tabs */}
-      <div className="flex items-center gap-6 mt-4 border-b border-border">
+      <div className="flex items-center gap-6 mt-4 border-b border-border-default">
         {(["videos", "about"] as TabKey[]).map((tab) => (
           <button
             key={tab}
@@ -130,7 +130,7 @@ export default function ChannelView({ channel, videos }: ChannelViewProps) {
             className={`pb-3 text-sm font-medium capitalize transition-base border-b-2 ${
               activeTab === tab
                 ? "text-text-primary border-text-primary"
-                : "text-text-tertiary border-transparent hover:text-text-secondary"
+                : "text-text-muted border-transparent hover:text-text-secondary"
             }`}
           >
             {tab}
@@ -151,7 +151,7 @@ export default function ChannelView({ channel, videos }: ChannelViewProps) {
             className="max-w-lg space-y-4"
           >
             <div className="flex items-center gap-3 text-sm">
-              <EyeIcon size={16} className="text-text-tertiary" />
+              <EyeIcon size={16} className="text-text-muted" />
               <span className="text-text-secondary">
                 Joined {new Date(channel.createdAt).toLocaleDateString("en-US", {
                   year: "numeric",

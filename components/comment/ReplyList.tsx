@@ -105,10 +105,10 @@ function ReplyItem({
             alt={reply.author.name || "User"}
             width={24}
             height={24}
-            className="w-6 h-6 rounded-full object-cover border border-border"
+            className="w-6 h-6 rounded-full object-cover border border-border-default"
           />
         ) : (
-          <div className="w-6 h-6 rounded-full bg-surface-hover border border-border flex items-center justify-center">
+          <div className="w-6 h-6 rounded-full bg-bg-hover border border-border-default flex items-center justify-center">
             <span className="text-[10px] font-medium text-text-secondary">
               {reply.author.name?.charAt(0)?.toUpperCase() || "?"}
             </span>
@@ -124,7 +124,7 @@ function ReplyItem({
           >
             {reply.author.name || "Unknown"}
           </Link>
-          <span className="text-xs text-text-tertiary">{formatTimeAgo(reply.createdAt)}</span>
+          <span className="text-xs text-text-muted">{formatTimeAgo(reply.createdAt)}</span>
         </div>
 
         <p className="text-sm text-text-primary mt-0.5 leading-relaxed whitespace-pre-wrap wrap-break-word">
@@ -136,8 +136,8 @@ function ReplyItem({
             onClick={() => handleVote("LIKE")}
             className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-xs transition-base ${
               currentVote === "LIKE"
-                ? "text-accent-text bg-accent-subtle"
-                : "text-text-tertiary hover:text-text-secondary hover:bg-surface-hover"
+                ? "text-amber-100 bg-amber-700"
+                : "text-text-muted hover:text-text-secondary hover:bg-bg-hover"
             }`}
           >
             <ThumbsUpIcon size={12} weight={currentVote === "LIKE" ? "fill" : "regular"} />
@@ -148,8 +148,8 @@ function ReplyItem({
             onClick={() => handleVote("DISLIKE")}
             className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-xs transition-base ${
               currentVote === "DISLIKE"
-                ? "text-danger-text bg-danger-subtle"
-                : "text-text-tertiary hover:text-text-secondary hover:bg-surface-hover"
+                ? "text-vermillion-100 bg-vermillion-700"
+                : "text-text-muted hover:text-text-secondary hover:bg-bg-hover"
             }`}
           >
             <ThumbsDownIcon size={12} weight={currentVote === "DISLIKE" ? "fill" : "regular"} />
@@ -157,7 +157,7 @@ function ReplyItem({
 
           <button
             onClick={() => setShowReplyForm(!showReplyForm)}
-            className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-xs text-text-tertiary hover:text-text-secondary hover:bg-surface-hover transition-base"
+            className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-xs text-text-muted hover:text-text-secondary hover:bg-bg-hover transition-base"
           >
             <ChatCircleIcon size={12} />
             Reply
@@ -185,7 +185,7 @@ export default function ReplyList({ replies, videoId, parentId }: ReplyListProps
   if (replies.length === 0) return null;
 
   return (
-    <div className="space-y-4 pl-1 border-l-2 border-border ml-1">
+    <div className="space-y-4 pl-1 border-l-2 border-border-default ml-1">
       <div className="pl-4 space-y-4">
         {replies.map((reply) => (
           <ReplyItem

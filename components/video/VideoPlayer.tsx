@@ -225,44 +225,44 @@ export default function VideoPlayer({ src, poster, title, playing, onPlayingChan
       {/* Loading spinner */}
       {isLoading && (
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-          <div className="w-10 h-10 border-2 border-surface/30 border-t-surface rounded-full animate-spin" />
+          <div className="w-10 h-10 border-2 border-bg-surface/30 border-t-bg-surface rounded-full animate-spin" />
         </div>
       )}
 
       {/* Click-to-play overlay when paused */}
       {!playing && !isLoading && (
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-          <div className="w-16 h-16 rounded-full bg-text-primary/60 flex items-center justify-center backdrop-blur-sm">
-            <PlayIcon size={28} weight="fill" className="text-surface ml-1" />
+          <div className="w-16 h-16 rounded-full bg-bg-base/60 flex items-center justify-center backdrop-blur-sm">
+            <PlayIcon size={28} weight="fill" className="text-text-primary ml-1" />
           </div>
         </div>
       )}
 
       {/* Controls overlay */}
       <div
-        className={`absolute inset-x-0 bottom-0 bg-linear-to-t from-text-primary/70 via-text-primary/20 to-transparent pt-16 pb-3 px-4 transition-opacity duration-300 ${
+        className={`absolute inset-x-0 bottom-0 bg-linear-to-t from-bg-base/70 via-bg-base/20 to-transparent pt-16 pb-3 px-4 transition-opacity duration-300 ${
           showControls ? "opacity-100" : "opacity-0 pointer-events-none"
         }`}
       >
         {/* Progress bar */}
         <div
           ref={progressRef}
-          className="relative h-1 bg-surface/20 rounded-full mb-3 cursor-pointer group/progress"
+          className="relative h-1 bg-text-primary/20 rounded-full mb-3 cursor-pointer group/progress"
           onClick={handleProgressClick}
         >
           {/* Buffered */}
           <div
-            className="absolute inset-y-0 left-0 bg-surface/30 rounded-full"
+            className="absolute inset-y-0 left-0 bg-text-primary/30 rounded-full"
             style={{ width: `${bufferProgress}%` }}
           />
           {/* Played */}
           <div
-            className="absolute inset-y-0 left-0 bg-accent rounded-full"
+            className="absolute inset-y-0 left-0 bg-amber-500 rounded-full"
             style={{ width: `${progress}%` }}
           />
           {/* Scrubber */}
           <div
-            className="absolute top-1/2 -translate-y-1/2 w-3 h-3 bg-accent rounded-full opacity-0 group-hover/progress:opacity-100 transition-opacity"
+            className="absolute top-1/2 -translate-y-1/2 w-3 h-3 bg-amber-500 rounded-full opacity-0 group-hover/progress:opacity-100 transition-opacity"
             style={{ left: `calc(${progress}% - 6px)` }}
           />
         </div>
@@ -272,7 +272,7 @@ export default function VideoPlayer({ src, poster, title, playing, onPlayingChan
           <div className="flex items-center gap-2">
             <button
               onClick={() => skip(-10)}
-              className="p-1.5 rounded-md hover:bg-surface/10 transition-base text-surface"
+              className="p-1.5 rounded-md hover:bg-text-primary/10 transition-base text-text-primary"
               aria-label="Rewind 10 seconds"
             >
               <SkipBackIcon size={18} weight="bold" />
@@ -280,7 +280,7 @@ export default function VideoPlayer({ src, poster, title, playing, onPlayingChan
 
             <button
               onClick={togglePlay}
-              className="p-1.5 rounded-md hover:bg-surface/10 transition-base text-surface"
+              className="p-1.5 rounded-md hover:bg-text-primary/10 transition-base text-text-primary"
               aria-label={playing ? "Pause" : "Play"}
             >
               {playing ? (
@@ -292,7 +292,7 @@ export default function VideoPlayer({ src, poster, title, playing, onPlayingChan
 
             <button
               onClick={() => skip(10)}
-              className="p-1.5 rounded-md hover:bg-surface/10 transition-base text-surface"
+              className="p-1.5 rounded-md hover:bg-text-primary/10 transition-base text-text-primary"
               aria-label="Forward 10 seconds"
             >
               <SkipForwardIcon size={18} weight="bold" />
@@ -302,7 +302,7 @@ export default function VideoPlayer({ src, poster, title, playing, onPlayingChan
             <div className="flex items-center gap-1.5 group/vol">
               <button
                 onClick={toggleMute}
-                className="p-1.5 rounded-md hover:bg-surface/10 transition-base text-surface"
+                className="p-1.5 rounded-md hover:bg-text-primary/10 transition-base text-text-primary"
                 aria-label={muted ? "Unmute" : "Mute"}
               >
                 {muted || volume === 0 ? (
@@ -318,26 +318,26 @@ export default function VideoPlayer({ src, poster, title, playing, onPlayingChan
                 step="0.05"
                 value={muted ? 0 : volume}
                 onChange={handleVolumeChange}
-                className="w-0 group-hover/vol:w-16 transition-all duration-200 accent-accent cursor-pointer"
+                className="w-0 group-hover/vol:w-16 transition-all duration-200 accent-amber-500 cursor-pointer"
               />
             </div>
 
             {/* Time */}
-            <span className="text-xs text-surface/80 font-mono ml-1">
+            <span className="text-xs text-text-primary/80 font-mono ml-1">
               {formatTime(currentTime)} / {formatTime(duration)}
             </span>
           </div>
 
           <div className="flex items-center gap-1">
             <button
-              className="p-1.5 rounded-md hover:bg-surface/10 transition-base text-surface"
+              className="p-1.5 rounded-md hover:bg-text-primary/10 transition-base text-text-primary"
               aria-label="Settings"
             >
               <GearIcon size={18} />
             </button>
             <button
               onClick={toggleFullscreen}
-              className="p-1.5 rounded-md hover:bg-surface/10 transition-base text-surface"
+              className="p-1.5 rounded-md hover:bg-text-primary/10 transition-base text-text-primary"
               aria-label={isFullscreen ? "Exit fullscreen" : "Fullscreen"}
             >
               {isFullscreen ? (
@@ -353,11 +353,11 @@ export default function VideoPlayer({ src, poster, title, playing, onPlayingChan
       {/* Title overlay (top) */}
       {title && (
         <div
-          className={`absolute inset-x-0 top-0 bg-linear-to-b from-text-primary/50 to-transparent pt-3 pb-8 px-4 transition-opacity duration-300 ${
+          className={`absolute inset-x-0 top-0 bg-linear-to-b from-bg-base/50 to-transparent pt-3 pb-8 px-4 transition-opacity duration-300 ${
             showControls ? "opacity-100" : "opacity-0"
           }`}
         >
-          <p className="text-sm text-surface font-medium truncate">{title}</p>
+          <p className="text-sm text-text-primary font-medium truncate">{title}</p>
         </div>
       )}
     </div>

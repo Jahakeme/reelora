@@ -30,7 +30,7 @@ export default function RootLayout({
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full bg-background text-foreground font-sans">
+      <body className="min-h-full bg-bg-base text-text-primary font-sans">
         <SessionProvider>
           <QueryProvider>
             {children}
@@ -39,8 +39,8 @@ export default function RootLayout({
             position="bottom-right"
             toastOptions={{
               style: {
-                background: "var(--surface)",
-                border: "1px solid var(--border)",
+                background: "var(--bg-surface)",
+                border: "1px solid var(--border-default)",
                 color: "var(--text-primary)",
                 fontSize: "13px",
               },

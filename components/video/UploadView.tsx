@@ -17,14 +17,14 @@ export default function UploadView() {
     <div className="max-w-3xl mx-auto py-4">
       {/* Header */}
       <div className="flex items-center gap-3 mb-8">
-        <div className="w-10 h-10 rounded-xl bg-surface-hover flex items-center justify-center">
+        <div className="w-10 h-10 rounded-xl bg-bg-hover flex items-center justify-center">
           <VideoCameraIcon size={20} weight="bold" className="text-text-secondary" />
         </div>
         <div>
           <h1 className="text-lg font-semibold text-text-primary tracking-tight">
             Upload video
           </h1>
-          <p className="text-xs text-text-tertiary">
+          <p className="text-xs text-text-muted">
             Share your content with the Reelora community
           </p>
         </div>

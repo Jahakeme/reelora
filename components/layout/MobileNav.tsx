@@ -22,7 +22,7 @@ export default function MobileNav() {
   const pathname = usePathname();
 
   return (
-    <nav style={{ viewTransitionName: "persistent-mobile-nav" }} className="fixed bottom-0 left-0 right-0 z-40 bg-surface border-t border-border md:hidden">
+    <nav style={{ viewTransitionName: "persistent-mobile-nav" }} className="fixed bottom-0 left-0 right-0 z-40 bg-bg-surface border-t border-border-default md:hidden">
       <div className="flex items-center justify-around px-2 py-1">
         {navItems.map((item) => {
           const active = pathname === item.href;
@@ -34,7 +34,7 @@ export default function MobileNav() {
               className={`flex flex-col items-center gap-0.5 px-3 py-2 rounded-lg transition-base ${
                 active
                   ? "text-text-primary"
-                  : "text-text-tertiary hover:text-text-secondary"
+                  : "text-text-muted hover:text-text-secondary"
               }`}
             >
               <Icon size={20} weight={active ? "fill" : "regular"} />

@@ -1,64 +1,90 @@
 @import "tailwindcss";
 
 :root {
-  --background: #FBFBFA;
-  --foreground: #2F3437;
-  --surface: #FFFFFF;
-  --surface-hover: #F7F6F3;
-  --border: #EAEAEA;
-  --border-subtle: rgba(0, 0, 0, 0.06);
-  --text-primary: #111111;
-  --text-secondary: #787774;
-  --text-tertiary: #A3A3A0;
-  --accent: #1a8cd8;
-  --accent-hover: #1574b5;
-  --accent-subtle: #E1F3FE;
-  --accent-text: #1F6C9F;
-  --danger: #d1242f;
-  --danger-subtle: #FDEBEC;
-  --danger-text: #9F2F2D;
-  --success: #1a7f37;
-  --success-subtle: #EDF3EC;
-  --success-text: #346538;
-  --warning-subtle: #FBF3DB;
-  --warning-text: #956400;
+  /* Hot Gate — Background scale */
+  --bg-base:      #080605;
+  --bg-surface:   #110D09;
+  --bg-raised:    #1C1610;
+  --bg-overlay:   #261E14;
+  --bg-hover:     #2E2418;
+
+  /* Hot Gate — Amber (primary accent) */
+  --amber-100:    #F5E8C0;
+  --amber-300:    #E8C870;
+  --amber-500:    #D4A030;
+  --amber-700:    #6B4A10;
+  --amber-900:    #2E1C04;
+
+  /* Hot Gate — Vermillion (secondary accent) */
+  --vermillion-100: #EAB0A0;
+  --vermillion-300: #C04828;
+  --vermillion-500: #8A2A14;
+  --vermillion-700: #5A1A0A;
+  --vermillion-900: #2A0A04;
+
+  /* Hot Gate — Text */
+  --text-primary:   #F2EAD8;
+  --text-secondary: #B8A898;
+  --text-muted:     #7A6448;
+  --text-disabled:  #4A3C2C;
+  --text-inverse:   #080605;
+
+  /* Hot Gate — Borders */
+  --border-subtle:  #1C1610;
+  --border-default: #261E14;
+  --border-strong:  #3A2A18;
+  --border-accent:  rgba(212, 160, 48, 0.19);
+
   --sidebar-width: 240px;
   --navbar-height: 56px;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --color-surface: var(--surface);
-  --color-surface-hover: var(--surface-hover);
-  --color-border: var(--border);
-  --color-border-subtle: var(--border-subtle);
-  --color-text-primary: var(--text-primary);
+  /* Hot Gate — Background scale */
+  --color-bg-base:    var(--bg-base);
+  --color-bg-surface: var(--bg-surface);
+  --color-bg-raised:  var(--bg-raised);
+  --color-bg-overlay: var(--bg-overlay);
+  --color-bg-hover:   var(--bg-hover);
+
+  /* Hot Gate — Amber */
+  --color-amber-100: var(--amber-100);
+  --color-amber-300: var(--amber-300);
+  --color-amber-500: var(--amber-500);
+  --color-amber-700: var(--amber-700);
+  --color-amber-900: var(--amber-900);
+
+  /* Hot Gate — Vermillion */
+  --color-vermillion-100: var(--vermillion-100);
+  --color-vermillion-300: var(--vermillion-300);
+  --color-vermillion-500: var(--vermillion-500);
+  --color-vermillion-700: var(--vermillion-700);
+  --color-vermillion-900: var(--vermillion-900);
+
+  /* Hot Gate — Text */
+  --color-text-primary:   var(--text-primary);
   --color-text-secondary: var(--text-secondary);
-  --color-text-tertiary: var(--text-tertiary);
-  --color-accent: var(--accent);
-  --color-accent-hover: var(--accent-hover);
-  --color-accent-subtle: var(--accent-subtle);
-  --color-accent-text: var(--accent-text);
-  --color-danger: var(--danger);
-  --color-danger-subtle: var(--danger-subtle);
-  --color-danger-text: var(--danger-text);
-  --color-success: var(--success);
-  --color-success-subtle: var(--success-subtle);
-  --color-success-text: var(--success-text);
-  --color-warning-subtle: var(--warning-subtle);
-  --color-warning-text: var(--warning-text);
+  --color-text-muted:     var(--text-muted);
+  --color-text-disabled:  var(--text-disabled);
+  --color-text-inverse:   var(--text-inverse);
+
+  /* Hot Gate — Borders */
+  --color-border-subtle:  var(--border-subtle);
+  --color-border-default: var(--border-default);
+  --color-border-strong:  var(--border-strong);
+  --color-border-accent:  var(--border-accent);
+
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
 * {
-  border-color: var(--border);
+  border-color: var(--border-default);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
+  background: var(--bg-base);
+  color: var(--text-primary);
   font-family: var(--font-geist-sans), system-ui, sans-serif;
 }
 
@@ -73,12 +99,12 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--border);
+  background: var(--border-strong);
   border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--text-tertiary);
+  background: var(--text-muted);
 }
 
 /* Focus ring utility */
@@ -87,7 +113,7 @@ body {
 }
 
 .focus-ring:focus-visible {
-  box-shadow: 0 0 0 2px var(--background), 0 0 0 4px var(--accent);
+  box-shadow: 0 0 0 2px var(--bg-base), 0 0 0 4px var(--amber-300);
   border-radius: 4px;
 }
 
@@ -109,9 +135,9 @@ body {
 .skeleton {
   background: linear-gradient(
     90deg,
-    var(--surface-hover) 25%,
-    var(--border) 50%,
-    var(--surface-hover) 75%
+    var(--bg-surface) 25%,
+    var(--bg-raised) 50%,
+    var(--bg-surface) 75%
   );
   background-size: 200% 100%;
   animation: shimmer 1.5s ease-in-out infinite;

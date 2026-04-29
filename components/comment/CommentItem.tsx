@@ -124,10 +124,10 @@ export default function CommentItem({
               alt={author.name || "User"}
               width={32}
               height={32}
-              className="w-8 h-8 rounded-full object-cover border border-border"
+              className="w-8 h-8 rounded-full object-cover border border-border-default"
             />
           ) : (
-            <div className="w-8 h-8 rounded-full bg-surface-hover border border-border flex items-center justify-center">
+            <div className="w-8 h-8 rounded-full bg-bg-hover border border-border-default flex items-center justify-center">
               <span className="text-xs font-medium text-text-secondary">
                 {author.name?.charAt(0)?.toUpperCase() || "?"}
               </span>
@@ -144,7 +144,7 @@ export default function CommentItem({
             >
               {author.name || "Unknown"}
             </Link>
-            <span className="text-xs text-text-tertiary">{formatTimeAgo(createdAt)}</span>
+            <span className="text-xs text-text-muted">{formatTimeAgo(createdAt)}</span>
           </div>
 
           {/* Body */}
@@ -158,8 +158,8 @@ export default function CommentItem({
               onClick={() => handleVote("LIKE")}
               className={`inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs transition-base ${
                 currentVote === "LIKE"
-                  ? "text-accent-text bg-accent-subtle"
-                  : "text-text-tertiary hover:text-text-secondary hover:bg-surface-hover"
+                  ? "text-amber-100 bg-amber-700"
+                  : "text-text-muted hover:text-text-secondary hover:bg-bg-hover"
               }`}
             >
               <ThumbsUpIcon size={14} weight={currentVote === "LIKE" ? "fill" : "regular"} />
@@ -170,8 +170,8 @@ export default function CommentItem({
               onClick={() => handleVote("DISLIKE")}
               className={`inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs transition-base ${
                 currentVote === "DISLIKE"
-                  ? "text-danger-text bg-danger-subtle"
-                  : "text-text-tertiary hover:text-text-secondary hover:bg-surface-hover"
+                  ? "text-vermillion-100 bg-vermillion-700"
+                  : "text-text-muted hover:text-text-secondary hover:bg-bg-hover"
               }`}
             >
               <ThumbsDownIcon size={14} weight={currentVote === "DISLIKE" ? "fill" : "regular"} />
@@ -180,14 +180,14 @@ export default function CommentItem({
 
             <button
               onClick={() => setShowReplyForm(!showReplyForm)}
-              className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs text-text-tertiary hover:text-text-secondary hover:bg-surface-hover transition-base"
+              className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs text-text-muted hover:text-text-secondary hover:bg-bg-hover transition-base"
             >
               <ChatCircleIcon size={14} />
               Reply
             </button>
 
             <button
-              className="p-1 rounded-md text-text-tertiary hover:text-text-secondary hover:bg-surface-hover transition-base opacity-0 group-hover:opacity-100"
+              className="p-1 rounded-md text-text-muted hover:text-text-secondary hover:bg-bg-hover transition-base opacity-0 group-hover:opacity-100"
               aria-label="More options"
             >
               <DotsThreeIcon size={16} weight="bold" />
@@ -214,7 +214,7 @@ export default function CommentItem({
               {!showReplies ? (
                 <button
                   onClick={() => setShowReplies(true)}
-                  className="text-xs font-medium text-accent-text hover:text-accent transition-base"
+                  className="text-xs font-medium text-amber-100 hover:text-amber-500 transition-base"
                 >
                   View {replyCount} {replyCount === 1 ? "reply" : "replies"}
                 </button>
@@ -222,7 +222,7 @@ export default function CommentItem({
                 <>
                   <button
                     onClick={() => setShowReplies(false)}
-                    className="text-xs font-medium text-accent-text hover:text-accent transition-base mb-3"
+                    className="text-xs font-medium text-amber-100 hover:text-amber-500 transition-base mb-3"
                   >
                     Hide replies
                   </button>

@@ -48,12 +48,12 @@ export default function Navbar() {
   const isActive = (path: string) => pathname === path;
 
   return (
-    <nav style={{ viewTransitionName: "persistent-nav" }} className="fixed top-0 left-0 right-0 z-40 h-(--navbar-height) bg-surface border-b border-border flex items-center px-4 gap-4">
+    <nav style={{ viewTransitionName: "persistent-nav" }} className="fixed top-0 left-0 right-0 z-40 h-(--navbar-height) bg-bg-surface border-b border-border-default flex items-center px-4 gap-4">
       {/* Left: Logo */}
       <div className="flex items-center gap-3 shrink-0">
         <Link href="/" className="flex items-center gap-2 group">
-          <div className="w-7 h-7 rounded-md bg-text-primary flex items-center justify-center">
-            <span className="text-surface text-xs font-bold tracking-tight">R</span>
+          <div className="w-7 h-7 rounded-md bg-amber-500 flex items-center justify-center">
+            <span className="text-text-inverse text-xs font-bold tracking-tight">R</span>
           </div>
           <span className="text-text-primary font-semibold text-base tracking-tight hidden sm:block">
             Reelora
@@ -67,8 +67,8 @@ export default function Navbar() {
           <div
             className={`flex items-center border rounded-lg overflow-hidden transition-base ${
               searchFocused
-                ? "border-accent shadow-[0_0_0_1px_var(--accent)]"
-                : "border-border hover:border-text-tertiary"
+                ? "border-amber-500 shadow-[0_0_0_1px_var(--amber-500)]"
+                : "border-border-default hover:border-text-muted"
             }`}
           >
             <input
@@ -79,7 +79,7 @@ export default function Navbar() {
               onFocus={() => setSearchFocused(true)}
               onBlur={() => setSearchFocused(false)}
               placeholder="Search videos..."
-              className="flex-1 bg-transparent px-4 py-2 text-sm text-text-primary placeholder:text-text-tertiary outline-none"
+              className="flex-1 bg-transparent px-4 py-2 text-sm text-text-primary placeholder:text-text-muted outline-none"
             />
             {searchQuery && (
               <button
@@ -88,14 +88,14 @@ export default function Navbar() {
                   setSearchQuery("");
                   searchInputRef.current?.focus();
                 }}
-                className="p-1.5 mr-1 rounded hover:bg-surface-hover transition-base"
+                className="p-1.5 mr-1 rounded hover:bg-bg-hover transition-base"
               >
                 <XIcon size={14} className="text-text-secondary" />
               </button>
             )}
             <button
               type="submit"
-              className="px-4 py-2 border-l border-border bg-surface-hover hover:bg-border transition-base"
+              className="px-4 py-2 border-l border-border-default bg-bg-hover hover:bg-border-default transition-base"
             >
               <MagnifyingGlassIcon size={16} className="text-text-secondary" />
             </button>
@@ -109,8 +109,8 @@ export default function Navbar() {
           href="/upload"
           className={`p-2 rounded-lg transition-base focus-ring ${
             isActive("/upload")
-              ? "bg-accent-subtle text-accent-text"
-              : "hover:bg-surface-hover text-text-secondary"
+              ? "bg-amber-700 text-amber-100"
+              : "hover:bg-bg-hover text-text-secondary"
           }`}
           aria-label="Upload video"
         >
@@ -119,7 +119,7 @@ export default function Navbar() {
 
         {user && (
           <button
-            className="p-2 rounded-lg hover:bg-surface-hover transition-base focus-ring relative text-text-secondary"
+            className="p-2 rounded-lg hover:bg-bg-hover transition-base focus-ring relative text-text-secondary"
             aria-label="Notifications"
           >
             <BellIcon size={20} weight="bold" />
@@ -130,7 +130,7 @@ export default function Navbar() {
         <div ref={profileRef} className="relative">
           <button
             onClick={() => setProfileOpen(!profileOpen)}
-            className="p-1.5 rounded-lg hover:bg-surface-hover transition-base focus-ring"
+            className="p-1.5 rounded-lg hover:bg-bg-hover transition-base focus-ring"
             aria-label="Account menu"
           >
             {user?.image ? (
@@ -139,24 +139,24 @@ export default function Navbar() {
                 alt={user.name || "Profile"}
                 width={28}
                 height={28}
-                className="w-7 h-7 rounded-full object-cover border border-border"
+                className="w-7 h-7 rounded-full object-cover border border-border-default"
               />
             ) : (
-              <div className="w-7 h-7 rounded-full bg-surface-hover border border-border flex items-center justify-center">
+              <div className="w-7 h-7 rounded-full bg-bg-hover border border-border-default flex items-center justify-center">
                 {user ? (
                   <span className="text-xs font-medium text-text-secondary">
                     {user.name?.charAt(0)?.toUpperCase() || "U"}
                   </span>
                 ) : (
-                  <UserCircleIcon size={20} weight="fill" className="text-text-tertiary" />
+                  <UserCircleIcon size={20} weight="fill" className="text-text-muted" />
                 )}
               </div>
             )}
           </button>
 
           {profileOpen && (
-            <div className="absolute right-0 top-full mt-2 w-56 bg-surface border border-border rounded-lg shadow-[0_4px_16px_rgba(0,0,0,0.06)] py-1 z-50">
-              <div className="px-4 py-3 border-b border-border">
+            <div className="absolute right-0 top-full mt-2 w-56 bg-bg-surface border border-border-default rounded-lg shadow-[0_4px_16px_rgba(0,0,0,0.06)] py-1 z-50">
+              <div className="px-4 py-3 border-b border-border-default">
                 {user ? (
                   <>
                     <p className="text-sm font-medium text-text-primary truncate">
@@ -180,7 +180,7 @@ export default function Navbar() {
                     <Link
                       href={`/channel/${user.id}`}
                       onClick={() => setProfileOpen(false)}
-                      className="flex items-center gap-3 px-4 py-2 text-sm text-text-secondary hover:bg-surface-hover transition-base"
+                      className="flex items-center gap-3 px-4 py-2 text-sm text-text-secondary hover:bg-bg-hover transition-base"
                     >
                       <UserCircleIcon size={16} />
                       <span>Your channel</span>
@@ -188,7 +188,7 @@ export default function Navbar() {
                     <Link
                       href="/settings"
                       onClick={() => setProfileOpen(false)}
-                      className="flex items-center gap-3 px-4 py-2 text-sm text-text-secondary hover:bg-surface-hover transition-base"
+                      className="flex items-center gap-3 px-4 py-2 text-sm text-text-secondary hover:bg-bg-hover transition-base"
                     >
                       <GearIcon size={16} />
                       <span>Settings</span>
@@ -198,7 +198,7 @@ export default function Navbar() {
                         setProfileOpen(false);
                         signOut({ callbackUrl: "/" });
                       }}
-                      className="flex items-center gap-3 px-4 py-2 text-sm text-text-secondary hover:bg-surface-hover transition-base w-full text-left"
+                      className="flex items-center gap-3 px-4 py-2 text-sm text-text-secondary hover:bg-bg-hover transition-base w-full text-left"
                     >
                       <SignOutIcon size={16} />
                       <span>Sign out</span>
@@ -209,7 +209,7 @@ export default function Navbar() {
                   <Link
                     href={`/signin?callbackUrl=${encodeURIComponent(pathname)}`}
                     onClick={() => setProfileOpen(false)}
-                    className="flex items-center gap-3 px-4 py-2 text-sm text-text-secondary hover:bg-surface-hover transition-base"
+                    className="flex items-center gap-3 px-4 py-2 text-sm text-text-secondary hover:bg-bg-hover transition-base"
                   >
                     <SignInIcon size={16} />
                     <span>Sign in</span>

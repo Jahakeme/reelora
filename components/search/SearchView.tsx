@@ -98,7 +98,7 @@ export default function SearchView({ query, sort: initialSort, date: initialDate
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
-          <p className="text-xs text-text-tertiary">
+          <p className="text-xs text-text-muted">
             {loading ? "Searching..." : `${totalResults} results for`}
           </p>
           <h1 className="text-lg font-semibold text-text-primary tracking-tight mt-0.5">
@@ -110,8 +110,8 @@ export default function SearchView({ query, sort: initialSort, date: initialDate
           onClick={() => setShowFilters(!showFilters)}
           className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium transition-base ${
             showFilters
-              ? "bg-text-primary text-surface"
-              : "bg-surface-hover text-text-secondary hover:text-text-primary"
+              ? "bg-amber-500 text-text-inverse"
+              : "bg-bg-hover text-text-secondary hover:text-text-primary"
           }`}
         >
           <FunnelSimpleIcon size={14} />
@@ -125,7 +125,7 @@ export default function SearchView({ query, sort: initialSort, date: initialDate
           initial={{ opacity: 0, height: 0 }}
           animate={{ opacity: 1, height: "auto" }}
           exit={{ opacity: 0, height: 0 }}
-          className="mb-6 p-4 bg-surface border border-border rounded-xl"
+          className="mb-6 p-4 bg-bg-surface border border-border-default rounded-xl"
         >
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {/* Sort */}
@@ -145,8 +145,8 @@ export default function SearchView({ query, sort: initialSort, date: initialDate
                     onClick={() => setSortBy(key)}
                     className={`px-3 py-1.5 rounded-md text-xs font-medium transition-base ${
                       sortBy === key
-                        ? "bg-text-primary text-surface"
-                        : "bg-surface-hover text-text-secondary hover:text-text-primary"
+                        ? "bg-amber-500 text-text-inverse"
+                        : "bg-bg-hover text-text-secondary hover:text-text-primary"
                     }`}
                   >
                     {label}
@@ -174,8 +174,8 @@ export default function SearchView({ query, sort: initialSort, date: initialDate
                     onClick={() => setDateFilter(key)}
                     className={`px-3 py-1.5 rounded-md text-xs font-medium transition-base ${
                       dateFilter === key
-                        ? "bg-text-primary text-surface"
-                        : "bg-surface-hover text-text-secondary hover:text-text-primary"
+                        ? "bg-amber-500 text-text-inverse"
+                        : "bg-bg-hover text-text-secondary hover:text-text-primary"
                     }`}
                   >
                     {label}
@@ -204,11 +204,11 @@ export default function SearchView({ query, sort: initialSort, date: initialDate
         </div>
       ) : results.length === 0 ? (
         <div className="flex flex-col items-center py-20">
-          <div className="w-16 h-16 rounded-2xl bg-surface-hover flex items-center justify-center mb-4">
-            <MagnifyingGlassIcon size={24} className="text-text-tertiary" />
+          <div className="w-16 h-16 rounded-2xl bg-bg-hover flex items-center justify-center mb-4">
+            <MagnifyingGlassIcon size={24} className="text-text-muted" />
           </div>
           <p className="text-sm font-medium text-text-secondary">No results found</p>
-          <p className="text-xs text-text-tertiary mt-1">
+          <p className="text-xs text-text-muted mt-1">
             Try different keywords or remove filters
           </p>
         </div>
@@ -227,7 +227,7 @@ export default function SearchView({ query, sort: initialSort, date: initialDate
             >
               <Link href={`/watch/${result.id}`} className="flex gap-4 group">
                 {/* Thumbnail */}
-                <div className="relative w-64 shrink-0 aspect-video rounded-lg overflow-hidden bg-surface-hover">
+                <div className="relative w-64 shrink-0 aspect-video rounded-lg overflow-hidden bg-bg-hover">
                   {result.thumbnail ? (
                     <Image
                       src={toCloudinaryThumbnail(result.thumbnail)!}
@@ -238,11 +238,11 @@ export default function SearchView({ query, sort: initialSort, date: initialDate
                     />
                   ) : (
                     <div className="absolute inset-0 flex items-center justify-center">
-                      <EyeIcon size={20} className="text-text-tertiary" />
+                      <EyeIcon size={20} className="text-text-muted" />
                     </div>
                   )}
                   {result.duration !== null && (
-                    <span className="absolute bottom-2 right-2 px-1.5 py-0.5 bg-text-primary/80 text-surface text-xs font-mono rounded">
+                    <span className="absolute bottom-2 right-2 px-1.5 py-0.5 bg-bg-base/80 text-text-primary text-xs font-mono rounded">
                       {formatDuration(result.duration)}
                     </span>
                   )}
@@ -250,10 +250,10 @@ export default function SearchView({ query, sort: initialSort, date: initialDate
 
                 {/* Info */}
                 <div className="flex-1 min-w-0 py-1">
-                  <h3 className="text-sm font-medium text-text-primary leading-snug line-clamp-2 group-hover:text-accent-text transition-colors">
+                  <h3 className="text-sm font-medium text-text-primary leading-snug line-clamp-2 group-hover:text-amber-100 transition-colors">
                     {result.title}
                   </h3>
-                  <div className="flex items-center gap-2 mt-1.5 text-xs text-text-tertiary">
+                  <div className="flex items-center gap-2 mt-1.5 text-xs text-text-muted">
                     <span>{formatViews(result.views)}</span>
                     <span>&middot;</span>
                     <span>{formatTimeAgo(result.createdAt)}</span>
@@ -265,11 +265,11 @@ export default function SearchView({ query, sort: initialSort, date: initialDate
                         alt={result.owner.name || ""}
                         width={20}
                         height={20}
-                        className="w-5 h-5 rounded-full object-cover border border-border"
+                        className="w-5 h-5 rounded-full object-cover border border-border-default"
                       />
                     ) : (
-                      <div className="w-5 h-5 rounded-full bg-surface-hover border border-border flex items-center justify-center">
-                        <span className="text-[9px] font-medium text-text-tertiary">
+                      <div className="w-5 h-5 rounded-full bg-bg-hover border border-border-default flex items-center justify-center">
+                        <span className="text-[9px] font-medium text-text-muted">
                           {result.owner.name?.charAt(0)?.toUpperCase() || "?"}
                         </span>
                       </div>
@@ -279,7 +279,7 @@ export default function SearchView({ query, sort: initialSort, date: initialDate
                     </span>
                   </div>
                   {result.description && (
-                    <p className="text-xs text-text-tertiary mt-2 line-clamp-2 leading-relaxed">
+                    <p className="text-xs text-text-muted mt-2 line-clamp-2 leading-relaxed">
                       {result.description}
                     </p>
                   )}

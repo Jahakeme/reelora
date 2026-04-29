@@ -84,7 +84,7 @@ export default function VideoCard({
       <Link
         href={`/watch/${id}`}
         transitionTypes={["nav-forward"]}
-        className="block relative aspect-video rounded-lg overflow-hidden bg-surface-hover mb-3"
+        className="block relative aspect-video rounded-lg overflow-hidden bg-bg-hover mb-3"
       >
         {thumbnail ? (
           <>
@@ -103,15 +103,15 @@ export default function VideoCard({
           </>
         ) : (
           <div className="absolute inset-0 flex items-center justify-center">
-            <div className="w-12 h-12 rounded-lg bg-border flex items-center justify-center">
-              <EyeIcon size={20} className="text-text-tertiary" />
+            <div className="w-12 h-12 rounded-lg bg-border-default flex items-center justify-center">
+              <EyeIcon size={20} className="text-text-muted" />
             </div>
           </div>
         )}
 
         {/* Duration badge */}
         {duration !== null ? (
-          <div className="absolute bottom-2 right-2 px-1.5 py-0.5 bg-text-primary/80 text-surface text-xs font-mono rounded">
+          <div className="absolute bottom-2 right-2 px-1.5 py-0.5 bg-bg-base/80 text-text-primary text-xs font-mono rounded">
             {formatDuration(duration)}
           </div>
         ) : null}
@@ -130,10 +130,10 @@ export default function VideoCard({
               alt={owner.name || "Channel"}
               width={32}
               height={32}
-              className="w-8 h-8 rounded-full object-cover border border-border"
+              className="w-8 h-8 rounded-full object-cover border border-border-default"
             />
           ) : (
-            <div className="w-8 h-8 rounded-full bg-surface-hover border border-border flex items-center justify-center">
+            <div className="w-8 h-8 rounded-full bg-bg-hover border border-border-default flex items-center justify-center">
               <span className="text-xs font-medium text-text-secondary">
                 {owner.name?.charAt(0)?.toUpperCase() || "?"}
               </span>
@@ -147,7 +147,7 @@ export default function VideoCard({
             transitionTypes={["nav-forward"]}
             className="block"
           >
-            <h3 className="text-sm font-medium text-text-primary leading-snug line-clamp-2 group-hover:text-accent-text transition-colors">
+            <h3 className="text-sm font-medium text-text-primary leading-snug line-clamp-2 group-hover:text-amber-100 transition-colors">
               {title}
             </h3>
           </Link>
@@ -157,7 +157,7 @@ export default function VideoCard({
           >
             {owner.name || "Unknown"}
           </Link>
-          <div className="flex items-center gap-1.5 mt-0.5 text-xs text-text-tertiary">
+          <div className="flex items-center gap-1.5 mt-0.5 text-xs text-text-muted">
             <span className="flex items-center gap-1">
               <EyeIcon size={12} />
               {formatViews(views)}

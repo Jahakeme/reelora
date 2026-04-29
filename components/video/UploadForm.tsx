@@ -144,8 +144,8 @@ export default function UploadForm({ onUploadComplete }: UploadFormProps) {
           onClick={() => fileInputRef.current?.click()}
           className={`relative border-2 border-dashed rounded-xl p-12 text-center cursor-pointer transition-base ${
             dragOver
-              ? "border-accent bg-accent-subtle"
-              : "border-border hover:border-text-tertiary hover:bg-surface-hover"
+              ? "border-amber-500 bg-amber-700"
+              : "border-border-default hover:border-text-muted hover:bg-bg-hover"
           }`}
         >
           <input
@@ -159,27 +159,27 @@ export default function UploadForm({ onUploadComplete }: UploadFormProps) {
           <div className="flex flex-col items-center gap-4">
             <div
               className={`w-16 h-16 rounded-2xl flex items-center justify-center transition-base ${
-                dragOver ? "bg-accent/10" : "bg-surface-hover"
+                dragOver ? "bg-amber-500/10" : "bg-bg-hover"
               }`}
             >
               <CloudArrowUpIcon
                 size={28}
                 weight="bold"
-                className={dragOver ? "text-accent" : "text-text-tertiary"}
+                className={dragOver ? "text-amber-500" : "text-text-muted"}
               />
             </div>
             <div>
               <p className="text-sm font-medium text-text-primary">
                 Drag and drop your video here
               </p>
-              <p className="text-xs text-text-tertiary mt-1">
+              <p className="text-xs text-text-muted mt-1">
                 Or click to browse &middot; MP4, WebM, MOV &middot; Max 500MB
               </p>
             </div>
           </div>
 
           {status === "error" && errorMessage && (
-            <div className="mt-4 flex items-center justify-center gap-2 text-danger-text text-sm">
+            <div className="mt-4 flex items-center justify-center gap-2 text-vermillion-100 text-sm">
               <WarningIcon size={16} />
               <span>{errorMessage}</span>
             </div>
@@ -188,7 +188,7 @@ export default function UploadForm({ onUploadComplete }: UploadFormProps) {
       ) : (
         <div className="space-y-6">
           {/* Preview + progress */}
-          <div className="relative rounded-xl overflow-hidden bg-text-primary aspect-video">
+          <div className="relative rounded-xl overflow-hidden bg-bg-base aspect-video">
             {preview && (
               <video
                 src={preview}
@@ -199,16 +199,16 @@ export default function UploadForm({ onUploadComplete }: UploadFormProps) {
             )}
 
             {status === "uploading" && (
-              <div className="absolute inset-0 bg-text-primary/60 flex flex-col items-center justify-center gap-3">
-                <CircleNotchIcon size={32} className="text-surface animate-spin" />
+              <div className="absolute inset-0 bg-bg-base/60 flex flex-col items-center justify-center gap-3">
+                <CircleNotchIcon size={32} className="text-text-primary animate-spin" />
                 <div className="w-48">
-                  <div className="h-1 bg-surface/20 rounded-full overflow-hidden">
+                  <div className="h-1 bg-text-primary/20 rounded-full overflow-hidden">
                     <div
-                      className="h-full bg-accent rounded-full transition-all duration-300"
+                      className="h-full bg-amber-500 rounded-full transition-all duration-300"
                       style={{ width: `${progress}%` }}
                     />
                   </div>
-                  <p className="text-xs text-surface/80 font-mono text-center mt-2">
+                  <p className="text-xs text-text-primary/80 font-mono text-center mt-2">
                     {Math.round(progress)}%
                   </p>
                 </div>
@@ -216,11 +216,11 @@ export default function UploadForm({ onUploadComplete }: UploadFormProps) {
             )}
 
             {status === "success" && (
-              <div className="absolute inset-0 bg-text-primary/60 flex flex-col items-center justify-center gap-3">
-                <div className="w-12 h-12 rounded-full bg-success flex items-center justify-center">
-                  <CheckIcon size={24} weight="bold" className="text-surface" />
+              <div className="absolute inset-0 bg-bg-base/60 flex flex-col items-center justify-center gap-3">
+                <div className="w-12 h-12 rounded-full bg-amber-500 flex items-center justify-center">
+                  <CheckIcon size={24} weight="bold" className="text-text-primary" />
                 </div>
-                <p className="text-sm text-surface font-medium">Upload complete</p>
+                <p className="text-sm text-text-primary font-medium">Upload complete</p>
               </div>
             )}
 
@@ -229,7 +229,7 @@ export default function UploadForm({ onUploadComplete }: UploadFormProps) {
               <button
                 type="button"
                 onClick={reset}
-                className="absolute top-3 right-3 p-1.5 rounded-lg bg-text-primary/60 hover:bg-text-primary/80 text-surface transition-base"
+                className="absolute top-3 right-3 p-1.5 rounded-lg bg-bg-base/60 hover:bg-bg-base/80 text-text-primary transition-base"
               >
                 <XIcon size={16} />
               </button>
@@ -238,11 +238,11 @@ export default function UploadForm({ onUploadComplete }: UploadFormProps) {
 
           {/* File info */}
           {file && (
-            <div className="flex items-center gap-3 px-4 py-3 bg-surface-hover rounded-lg">
-              <VideoCameraIcon size={18} className="text-text-tertiary shrink-0" />
+            <div className="flex items-center gap-3 px-4 py-3 bg-bg-hover rounded-lg">
+              <VideoCameraIcon size={18} className="text-text-muted shrink-0" />
               <div className="min-w-0 flex-1">
                 <p className="text-sm text-text-primary font-medium truncate">{file.name}</p>
-                <p className="text-xs text-text-tertiary font-mono">
+                <p className="text-xs text-text-muted font-mono">
                   {(file.size / (1024 * 1024)).toFixed(1)} MB
                 </p>
               </div>
@@ -264,9 +264,9 @@ export default function UploadForm({ onUploadComplete }: UploadFormProps) {
                   placeholder="Give your video a title"
                   maxLength={100}
                   required
-                  className="w-full px-4 py-2.5 bg-surface border border-border rounded-lg text-sm text-text-primary placeholder:text-text-tertiary focus:outline-none focus:border-accent focus:shadow-[0_0_0_1px_var(--accent)] transition-base"
+                  className="w-full px-4 py-2.5 bg-bg-surface border border-border-default rounded-lg text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:border-amber-500 focus:shadow-[0_0_0_1px_var(--amber-500)] transition-base"
                 />
-                <p className="text-xs text-text-tertiary text-right">
+                <p className="text-xs text-text-muted text-right">
                   {title.length}/100
                 </p>
               </div>
@@ -282,7 +282,7 @@ export default function UploadForm({ onUploadComplete }: UploadFormProps) {
                   placeholder="Tell viewers about your video"
                   rows={4}
                   maxLength={2000}
-                  className="w-full px-4 py-2.5 bg-surface border border-border rounded-lg text-sm text-text-primary placeholder:text-text-tertiary focus:outline-none focus:border-accent focus:shadow-[0_0_0_1px_var(--accent)] transition-base resize-none"
+                  className="w-full px-4 py-2.5 bg-bg-surface border border-border-default rounded-lg text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:border-amber-500 focus:shadow-[0_0_0_1px_var(--amber-500)] transition-base resize-none"
                 />
               </div>
 
@@ -291,17 +291,17 @@ export default function UploadForm({ onUploadComplete }: UploadFormProps) {
                 <label className="block text-sm font-medium text-text-primary">
                   Tags
                 </label>
-                <div className="flex flex-wrap gap-2 p-3 bg-surface border border-border rounded-lg focus-within:border-accent focus-within:shadow-[0_0_0_1px_var(--accent)] transition-base">
+                <div className="flex flex-wrap gap-2 p-3 bg-bg-surface border border-border-default rounded-lg focus-within:border-amber-500 focus-within:shadow-[0_0_0_1px_var(--amber-500)] transition-base">
                   {tags.map((tag) => (
                     <span
                       key={tag}
-                      className="inline-flex items-center gap-1 px-2.5 py-1 bg-accent-subtle text-accent-text text-xs font-medium rounded-full"
+                      className="inline-flex items-center gap-1 px-2.5 py-1 bg-amber-700 text-amber-100 text-xs font-medium rounded-full"
                     >
                       {tag}
                       <button
                         type="button"
                         onClick={() => removeTag(tag)}
-                        className="hover:text-accent transition-base"
+                        className="hover:text-amber-500 transition-base"
                       >
                         <XIcon size={12} />
                       </button>
@@ -313,10 +313,10 @@ export default function UploadForm({ onUploadComplete }: UploadFormProps) {
                     onChange={(e) => setTagInput(e.target.value)}
                     onKeyDown={handleTagKeyDown}
                     placeholder={tags.length === 0 ? "Add tags (press Enter)" : ""}
-                    className="flex-1 min-w-30 bg-transparent text-sm text-text-primary placeholder:text-text-tertiary outline-none"
+                    className="flex-1 min-w-30 bg-transparent text-sm text-text-primary placeholder:text-text-muted outline-none"
                   />
                 </div>
-                <p className="text-xs text-text-tertiary">
+                <p className="text-xs text-text-muted">
                   {tags.length}/10 tags &middot; Press Enter or comma to add
                 </p>
               </div>
@@ -326,14 +326,14 @@ export default function UploadForm({ onUploadComplete }: UploadFormProps) {
                 <button
                   type="submit"
                   disabled={!title.trim() || uploadMutation.isPending}
-                  className="px-6 py-2.5 bg-text-primary text-surface text-sm font-medium rounded-md hover:bg-[#333333] active:scale-[0.98] transition-base disabled:opacity-40 disabled:cursor-not-allowed"
+                  className="px-6 py-2.5 bg-amber-500 text-text-inverse text-sm font-medium rounded-md hover:bg-amber-300 active:scale-[0.98] transition-base disabled:opacity-40 disabled:cursor-not-allowed"
                 >
                   {uploadMutation.isPending ? "Uploading..." : "Publish"}
                 </button>
                 <button
                   type="button"
                   onClick={reset}
-                  className="px-6 py-2.5 text-sm font-medium text-text-secondary hover:text-text-primary hover:bg-surface-hover rounded-md transition-base"
+                  className="px-6 py-2.5 text-sm font-medium text-text-secondary hover:text-text-primary hover:bg-bg-hover rounded-md transition-base"
                 >
                   Cancel
                 </button>
@@ -347,7 +347,7 @@ export default function UploadForm({ onUploadComplete }: UploadFormProps) {
               <button
                 type="button"
                 onClick={reset}
-                className="px-6 py-2.5 bg-text-primary text-surface text-sm font-medium rounded-md hover:bg-[#333333] active:scale-[0.98] transition-base"
+                className="px-6 py-2.5 bg-amber-500 text-text-inverse text-sm font-medium rounded-md hover:bg-amber-300 active:scale-[0.98] transition-base"
               >
                 Upload another
               </button>

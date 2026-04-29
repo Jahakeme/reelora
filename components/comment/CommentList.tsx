@@ -108,14 +108,14 @@ export default function CommentList({ videoId }: CommentListProps) {
             Comments
           </h2>
           {totalCount > 0 && (
-            <span className="text-xs font-mono text-text-tertiary bg-surface-hover px-2 py-0.5 rounded-full">
+            <span className="text-xs font-mono text-text-muted bg-bg-hover px-2 py-0.5 rounded-full">
               {totalCount}
             </span>
           )}
         </div>
 
         <div className="flex items-center gap-1">
-          <FunnelSimpleIcon size={14} className="text-text-tertiary" />
+          <FunnelSimpleIcon size={14} className="text-text-muted" />
           <select
             value={sort}
             onChange={(e) => setSort(e.target.value as SortOption)}
@@ -148,11 +148,11 @@ export default function CommentList({ videoId }: CommentListProps) {
         </div>
       ) : comments.length === 0 ? (
         <div className="flex flex-col items-center py-12 text-center">
-          <div className="w-12 h-12 rounded-2xl bg-surface-hover flex items-center justify-center mb-3">
-            <ChatCircleIcon size={20} className="text-text-tertiary" />
+          <div className="w-12 h-12 rounded-2xl bg-bg-hover flex items-center justify-center mb-3">
+            <ChatCircleIcon size={20} className="text-text-muted" />
           </div>
           <p className="text-sm font-medium text-text-secondary">No comments yet</p>
-          <p className="text-xs text-text-tertiary mt-1">Start the conversation</p>
+          <p className="text-xs text-text-muted mt-1">Start the conversation</p>
         </div>
       ) : (
         <>
@@ -179,7 +179,7 @@ export default function CommentList({ videoId }: CommentListProps) {
               <button
                 onClick={() => fetchComments(true)}
                 disabled={loadingMore}
-                className="inline-flex items-center gap-2 px-4 py-2 text-xs font-medium text-text-secondary hover:text-text-primary hover:bg-surface-hover rounded-lg transition-base disabled:opacity-50"
+                className="inline-flex items-center gap-2 px-4 py-2 text-xs font-medium text-text-secondary hover:text-text-primary hover:bg-bg-hover rounded-lg transition-base disabled:opacity-50"
               >
                 <ArrowDownIcon size={14} />
                 {loadingMore ? "Loading..." : "Load more comments"}

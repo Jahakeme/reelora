@@ -60,8 +60,8 @@ function NavLink({
       onClick={onNavigate}
       className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-base ${
         active
-          ? "bg-surface-hover text-text-primary font-medium"
-          : "text-text-secondary hover:bg-surface-hover hover:text-text-primary"
+          ? "bg-bg-hover text-text-primary font-medium"
+          : "text-text-secondary hover:bg-bg-hover hover:text-text-primary"
       }`}
     >
       <Icon size={18} weight={active ? "fill" : "regular"} />
@@ -93,7 +93,7 @@ export default function Sidebar() {
   return (
     <aside
       style={{ viewTransitionName: "persistent-sidebar" }}
-      className={`fixed left-0 top-(--navbar-height) bottom-0 z-30 bg-surface border-r border-border transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] overflow-y-auto overflow-x-hidden w-(--sidebar-width) ${
+      className={`fixed left-0 top-(--navbar-height) bottom-0 z-30 bg-bg-surface border-r border-border-default transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] overflow-y-auto overflow-x-hidden w-(--sidebar-width) ${
         mobileDrawerOpen ? "translate-x-0 shadow-2xl" : "-translate-x-full"
       } md:translate-x-0 md:shadow-none ${
         isOpen ? "md:w-(--sidebar-width)" : "md:w-16"
@@ -103,7 +103,7 @@ export default function Sidebar() {
         {/* Toggle */}
         <button
           onClick={handleToggleClick}
-          className="flex items-center gap-3 px-3 py-2 rounded-lg text-text-primary hover:bg-surface-hover transition-base focus-ring mb-1"
+          className="flex items-center gap-3 px-3 py-2 rounded-lg text-text-primary hover:bg-bg-hover transition-base focus-ring mb-1"
           aria-label="Toggle sidebar"
         >
           <ListIcon size={18} weight="bold" />
@@ -124,8 +124,8 @@ export default function Sidebar() {
         </div>
 
         {/* Library */}
-        <div className={`pt-3 border-t border-border ${collapseClass}`}>
-          <p className="px-3 py-1.5 text-xs font-medium text-text-tertiary uppercase tracking-wider">
+        <div className={`pt-3 border-t border-border-default ${collapseClass}`}>
+          <p className="px-3 py-1.5 text-xs font-medium text-text-muted uppercase tracking-wider">
             Library
           </p>
         </div>
@@ -142,8 +142,8 @@ export default function Sidebar() {
         </div>
 
         {/* Categories */}
-        <div className={`pt-3 border-t border-border ${collapseClass}`}>
-          <p className="px-3 py-1.5 text-xs font-medium text-text-tertiary uppercase tracking-wider">
+        <div className={`pt-3 border-t border-border-default ${collapseClass}`}>
+          <p className="px-3 py-1.5 text-xs font-medium text-text-muted uppercase tracking-wider">
             Categories
           </p>
         </div>
@@ -160,11 +160,11 @@ export default function Sidebar() {
         </div>
 
         {/* Footer */}
-        <div className={`mt-6 px-3 py-4 border-t border-border ${collapseClass}`}>
-          <p className="text-xs text-text-tertiary leading-relaxed">
+        <div className={`mt-6 px-3 py-4 border-t border-border-default ${collapseClass}`}>
+          <p className="text-xs text-text-muted leading-relaxed">
             About &middot; Press &middot; Copyright &middot; Contact &middot; Creators
           </p>
-          <p className="text-xs text-text-tertiary mt-2 font-mono">Reelora 2026</p>
+          <p className="text-xs text-text-muted mt-2 font-mono">Reelora 2026</p>
         </div>
       </div>
     </aside>

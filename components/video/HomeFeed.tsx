@@ -76,8 +76,8 @@ export default function HomeFeed() {
             onClick={() => setActiveFilter(key)}
             className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-base ${
               activeFilter === key
-                ? "bg-text-primary text-surface"
-                : "bg-surface-hover text-text-secondary hover:text-text-primary hover:bg-border"
+                ? "bg-amber-500 text-text-inverse"
+                : "bg-bg-hover text-text-secondary hover:text-text-primary hover:bg-border-default"
             }`}
           >
             <Icon size={16} weight={activeFilter === key ? "fill" : "regular"} />
@@ -97,7 +97,7 @@ export default function HomeFeed() {
           {hasNextPage && (
             <div ref={sentinelRef} className="flex justify-center py-8">
               {isFetchingNextPage && (
-                <div className="w-6 h-6 border-2 border-border border-t-text-secondary rounded-full animate-spin" />
+                <div className="w-6 h-6 border-2 border-border-default border-t-text-secondary rounded-full animate-spin" />
               )}
             </div>
           )}

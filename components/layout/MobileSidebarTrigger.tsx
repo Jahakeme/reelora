@@ -31,7 +31,7 @@ export default function MobileSidebarTrigger() {
       aria-label="Open menu"
       className="md:hidden fixed left-0 top-1/2 -translate-y-1/2 z-40 px-2 py-3 group focus-ring rounded-r-lg"
     >
-      <span className="block w-1 h-12 rounded-r-full bg-text-tertiary group-hover:bg-text-primary group-active:bg-text-primary transition-base" />
+      <span className="block w-1 h-12 rounded-r-full bg-text-muted group-hover:bg-text-primary group-active:bg-text-primary transition-base" />
     </button>
   );
 }
