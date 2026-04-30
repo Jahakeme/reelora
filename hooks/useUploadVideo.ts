@@ -1,23 +1,8 @@
 import { useMutation } from "@tanstack/react-query";
-
-interface SignResponse {
-  uploadUrl: string;
-  signedParams: {
-    api_key: string;
-    timestamp: number;
-    folder: string;
-    eager: string;
-    eager_async: string;
-    signature: string;
-  };
-}
-
-interface CloudinaryResponse {
-  public_id: string;
-  secure_url: string;
-  eager?: Array<{ secure_url: string }>;
-  duration?: number;
-}
+import {
+  fetchSignedParams,
+  uploadToCloudinaryWithProgress,
+} from "@/lib/cloudinary/upload";
 
 interface UploadInput {
   file: File;
@@ -38,48 +23,10 @@ async function uploadVideo({
   tags,
   onProgress,
 }: UploadInput): Promise<UploadResult> {
-  // 1. Get signed params from our API
-  const signRes = await fetch("/api/upload/sign", { method: "POST" });
-  if (!signRes.ok) throw new Error("Failed to get upload signature");
-  const { uploadUrl, signedParams }: SignResponse = await signRes.json();
+  const sign = await fetchSignedParams("video");
+  const cloudinaryRes = await uploadToCloudinaryWithProgress(file, sign, onProgress);
 
-  // 2. Upload to Cloudinary via XHR (for progress tracking)
-  const cloudinaryRes = await new Promise<CloudinaryResponse>(
-    (resolve, reject) => {
-      const formData = new FormData();
-      formData.append("file", file);
-      formData.append("api_key", signedParams.api_key);
-      formData.append("timestamp", String(signedParams.timestamp));
-      formData.append("folder", signedParams.folder);
-      formData.append("eager", signedParams.eager);
-      formData.append("eager_async", signedParams.eager_async);
-      formData.append("signature", signedParams.signature);
-
-      const xhr = new XMLHttpRequest();
-      xhr.open("POST", uploadUrl);
-
-      xhr.upload.onprogress = (e) => {
-        if (e.lengthComputable) {
-          onProgress?.(Math.round((e.loaded / e.total) * 100));
-        }
-      };
-
-      xhr.onload = () => {
-        if (xhr.status >= 200 && xhr.status < 300) {
-          resolve(JSON.parse(xhr.responseText));
-        } else {
-          reject(new Error("Cloudinary upload failed"));
-        }
-      };
-
-      xhr.onerror = () => reject(new Error("Network error during upload"));
-      xhr.send(formData);
-    }
-  );
-
-  // 3. Save video record in our database
-  const thumbnail =
-    cloudinaryRes.eager?.[0]?.secure_url ?? null;
+  const thumbnail = cloudinaryRes.eager?.[0]?.secure_url ?? null;
 
   const createRes = await fetch("/api/videos", {
     method: "POST",

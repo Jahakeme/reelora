@@ -58,7 +58,7 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
   callbacks: {
-    async jwt({ token, user }) {
+    async jwt({ token, user, trigger, session }) {
       if (user) {
         token.id = user.id;
       } else if (token.email && !token.id) {
@@ -68,11 +68,23 @@ export const authOptions: NextAuthOptions = {
         });
         if (dbUser) token.id = dbUser.id;
       }
+      if (
+        trigger === "update" &&
+        session &&
+        typeof session === "object" &&
+        "image" in session &&
+        typeof (session as { image: unknown }).image === "string"
+      ) {
+        token.picture = (session as { image: string }).image;
+      }
       return token;
     },
     async session({ session, token }) {
       if (session.user) {
         session.user.id = token.id;
+        if (typeof token.picture === "string") {
+          session.user.image = token.picture;
+        }
       }
       return session;
     },

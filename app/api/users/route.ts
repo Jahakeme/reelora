@@ -4,6 +4,7 @@ import prisma from "@/lib/prisma";
 import { ok, handleRouteError, ApiException } from "@/lib/api/respond";
 import { requireAuth } from "@/lib/api/requireAuth";
 import { registerUserSchema, updateUserSchema } from "@/lib/schemas/user";
+import { isValidAvatarUrl } from "@/lib/cloudinary/validate";
 
 export async function POST(req: NextRequest) {
   try {
@@ -37,6 +38,10 @@ export async function PUT(req: NextRequest) {
   try {
     const { userId } = await requireAuth();
     const body = updateUserSchema.parse(await req.json());
+
+    if (body.image !== undefined && !isValidAvatarUrl(body.image, userId)) {
+      throw new ApiException("BAD_REQUEST", "Invalid avatar URL");
+    }
 
     const updated = await prisma.user.update({
       where: { id: userId },

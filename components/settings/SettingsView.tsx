@@ -1,81 +1,145 @@
 "use client";
 
-import { useState, useRef } from "react";
-import { signOut } from "next-auth/react";
+import { useEffect, useRef, useState } from "react";
+import { signOut, useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
+import { toast } from "sonner";
 import {
   UserCircleIcon,
   CameraIcon,
   CircleNotchIcon,
-  CheckIcon,
-  WarningIcon,
   SignOutIcon,
   TrashIcon,
 } from "@phosphor-icons/react";
+import {
+  fetchSignedParams,
+  uploadToCloudinaryWithProgress,
+} from "@/lib/cloudinary/upload";
 
 interface SettingsViewProps {
-  user?: {
+  user: {
     id: string;
     name: string;
     email: string;
     image: string | null;
-  } | null;
+  };
 }
 
+const ALLOWED_AVATAR_TYPES = ["image/jpeg", "image/png", "image/webp"];
+const MAX_AVATAR_BYTES = 4 * 1024 * 1024;
+
+type Phase = "idle" | "uploading" | "saving";
+
 export default function SettingsView({ user }: SettingsViewProps) {
+  const router = useRouter();
+  const { update } = useSession();
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const [name, setName] = useState(user?.name || "");
-  const [email] = useState(user?.email || "");
+
+  const [name, setName] = useState(user.name);
+  const [stagedFile, setStagedFile] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [phase, setPhase] = useState<Phase>("idle");
+  const [progress, setProgress] = useState(0);
+
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [avatarPreview, setAvatarPreview] = useState<string | null>(user?.image || null);
-  const [saving, setSaving] = useState(false);
   const [savingPassword, setSavingPassword] = useState(false);
-  const [successMessage, setSuccessMessage] = useState("");
-  const [errorMessage, setErrorMessage] = useState("");
+
+  useEffect(() => {
+    if (!previewUrl) return;
+    return () => URL.revokeObjectURL(previewUrl);
+  }, [previewUrl]);
+
+  const isBusy = phase !== "idle";
+  const isDirty = name.trim() !== user.name || stagedFile !== null;
+  const avatarSrc = previewUrl ?? user.image ?? null;
+  const saveLabel =
+    phase === "uploading"
+      ? `Uploading ${progress}%`
+      : phase === "saving"
+        ? "Saving..."
+        : "Save changes";
 
   function handleAvatarChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
-    if (file) {
-      if (file.size > 5 * 1024 * 1024) {
-        setErrorMessage("Image must be under 5MB");
-        return;
-      }
-      const url = URL.createObjectURL(file);
-      setAvatarPreview(url);
+    if (!file) return;
+
+    if (!ALLOWED_AVATAR_TYPES.includes(file.type)) {
+      toast.error("Avatar must be a JPEG, PNG, or WebP image");
+      e.target.value = "";
+      return;
     }
+    if (file.size > MAX_AVATAR_BYTES) {
+      toast.error("Image must be under 4MB");
+      e.target.value = "";
+      return;
+    }
+
+    setStagedFile(file);
+    setPreviewUrl(URL.createObjectURL(file));
   }
 
   async function handleProfileSave(e: React.FormEvent) {
     e.preventDefault();
-    if (!name.trim()) return;
+    if (!isDirty || isBusy) return;
+    if (!name.trim()) {
+      toast.error("Name cannot be empty");
+      return;
+    }
 
-    setSaving(true);
-    setErrorMessage("");
-    setSuccessMessage("");
-
+    let stage: Phase = "idle";
     try {
+      let imageUrl: string | undefined;
+
+      if (stagedFile) {
+        stage = "uploading";
+        setPhase("uploading");
+        setProgress(0);
+        const sign = await fetchSignedParams("avatar");
+        const result = await uploadToCloudinaryWithProgress(
+          stagedFile,
+          sign,
+          setProgress,
+        );
+        imageUrl = result.eager?.[0]?.secure_url ?? result.secure_url;
+      }
+
+      stage = "saving";
+      setPhase("saving");
+
+      const body: { name?: string; image?: string } = {};
+      if (name.trim() !== user.name) body.name = name.trim();
+      if (imageUrl) body.image = imageUrl;
+
       const res = await fetch("/api/users", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          id: user?.id,
-          fullName: name.trim(),
-        }),
+        body: JSON.stringify(body),
       });
 
-      if (res.ok) {
-        setSuccessMessage("Profile updated");
-        setTimeout(() => setSuccessMessage(""), 3000);
-      } else {
-        const data = await res.json();
-        setErrorMessage(data.message || "Failed to update profile");
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data?.error?.message || "Failed to update profile");
       }
-    } catch {
-      setErrorMessage("Something went wrong");
+
+      if (imageUrl) {
+        await update({ image: imageUrl });
+      }
+
+      toast.success("Profile updated");
+      setStagedFile(null);
+      setPreviewUrl(null);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+      router.refresh();
+    } catch (err) {
+      const message =
+        err instanceof Error ? err.message : "Something went wrong";
+      toast.error(stage === "uploading" ? `Upload failed: ${message}` : message);
     } finally {
-      setSaving(false);
+      setPhase("idle");
+      setProgress(0);
     }
   }
 
@@ -84,41 +148,33 @@ export default function SettingsView({ user }: SettingsViewProps) {
     if (!currentPassword || !newPassword || !confirmPassword) return;
 
     if (newPassword !== confirmPassword) {
-      setErrorMessage("New passwords do not match");
+      toast.error("New passwords do not match");
       return;
     }
-
     if (newPassword.length < 8) {
-      setErrorMessage("Password must be at least 8 characters");
+      toast.error("Password must be at least 8 characters");
       return;
     }
 
     setSavingPassword(true);
-    setErrorMessage("");
-    setSuccessMessage("");
-
     try {
       const res = await fetch("/api/users/password", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          currentPassword,
-          newPassword,
-        }),
+        body: JSON.stringify({ currentPassword, newPassword }),
       });
-
-      if (res.ok) {
-        setSuccessMessage("Password updated");
-        setCurrentPassword("");
-        setNewPassword("");
-        setConfirmPassword("");
-        setTimeout(() => setSuccessMessage(""), 3000);
-      } else {
-        const data = await res.json();
-        setErrorMessage(data.message || "Failed to update password");
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data?.error?.message || "Failed to update password");
       }
-    } catch {
-      setErrorMessage("Something went wrong");
+      toast.success("Password updated");
+      setCurrentPassword("");
+      setNewPassword("");
+      setConfirmPassword("");
+    } catch (err) {
+      const message =
+        err instanceof Error ? err.message : "Something went wrong";
+      toast.error(message);
     } finally {
       setSavingPassword(false);
     }
@@ -130,20 +186,6 @@ export default function SettingsView({ user }: SettingsViewProps) {
         Settings
       </h1>
 
-      {/* Success / Error messages */}
-      {successMessage && (
-        <div className="flex items-center gap-2 px-4 py-3 bg-amber-700 rounded-lg text-amber-100 text-sm mb-6">
-          <CheckIcon size={16} weight="bold" />
-          <span>{successMessage}</span>
-        </div>
-      )}
-      {errorMessage && (
-        <div className="flex items-center gap-2 px-4 py-3 bg-vermillion-700 rounded-lg text-vermillion-100 text-sm mb-6">
-          <WarningIcon size={16} />
-          <span>{errorMessage}</span>
-        </div>
-      )}
-
       {/* Profile section */}
       <section className="pb-8 border-b border-border-default">
         <h2 className="text-sm font-semibold text-text-primary mb-5">Profile</h2>
@@ -152,13 +194,13 @@ export default function SettingsView({ user }: SettingsViewProps) {
           {/* Avatar */}
           <div className="flex items-center gap-5">
             <div className="relative group">
-              {avatarPreview ? (
+              {avatarSrc ? (
                 <Image
-                  src={avatarPreview}
+                  src={avatarSrc}
                   alt="Avatar"
                   width={80}
                   height={80}
-                  unoptimized
+                  unoptimized={!!previewUrl}
                   className="w-20 h-20 rounded-full object-cover border border-border-default"
                 />
               ) : (
@@ -169,9 +211,11 @@ export default function SettingsView({ user }: SettingsViewProps) {
               <button
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
-                className="absolute inset-0 flex items-center justify-center rounded-full bg-bg-base/0 group-hover:bg-bg-base/40 transition-base"
+                disabled={isBusy}
+                aria-label="Change profile photo"
+                className="absolute inset-0 flex items-center justify-center rounded-full bg-bg-base/0 group-hover:bg-bg-base/40 transition-base disabled:cursor-not-allowed"
               >
-                <CameraIcon 
+                <CameraIcon
                   size={20}
                   className="text-text-primary opacity-0 group-hover:opacity-100 transition-base"
                 />
@@ -179,14 +223,23 @@ export default function SettingsView({ user }: SettingsViewProps) {
               <input
                 ref={fileInputRef}
                 type="file"
-                accept="image/*"
+                accept="image/jpeg,image/png,image/webp"
                 onChange={handleAvatarChange}
+                disabled={isBusy}
                 className="hidden"
               />
+              {phase === "uploading" ? (
+                <div className="absolute -bottom-2 left-0 right-0 h-1 rounded-full bg-bg-hover overflow-hidden">
+                  <div
+                    className="h-full bg-amber-500 transition-[width] duration-150 ease-linear"
+                    style={{ width: `${progress}%` }}
+                  />
+                </div>
+              ) : null}
             </div>
             <div>
               <p className="text-sm font-medium text-text-primary">Profile photo</p>
-              <p className="text-xs text-text-muted mt-0.5">JPG, PNG, or GIF. Max 5MB.</p>
+              <p className="text-xs text-text-muted mt-0.5">JPEG, PNG, or WebP. Max 4MB.</p>
             </div>
           </div>
 
@@ -197,7 +250,8 @@ export default function SettingsView({ user }: SettingsViewProps) {
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="w-full px-4 py-2.5 bg-bg-surface border border-border-default rounded-lg text-sm text-text-primary focus:outline-none focus:border-amber-500 focus:shadow-[0_0_0_1px_var(--amber-500)] transition-base"
+              disabled={isBusy}
+              className="w-full px-4 py-2.5 bg-bg-surface border border-border-default rounded-lg text-sm text-text-primary focus:outline-none focus:border-amber-500 focus:shadow-[0_0_0_1px_var(--amber-500)] transition-base disabled:opacity-60"
             />
           </div>
 
@@ -206,7 +260,7 @@ export default function SettingsView({ user }: SettingsViewProps) {
             <label className="block text-sm font-medium text-text-primary">Email</label>
             <input
               type="email"
-              value={email}
+              value={user.email}
               readOnly
               className="w-full px-4 py-2.5 bg-bg-hover border border-border-default rounded-lg text-sm text-text-muted cursor-not-allowed"
             />
@@ -216,11 +270,11 @@ export default function SettingsView({ user }: SettingsViewProps) {
           {/* Save */}
           <button
             type="submit"
-            disabled={saving || !name.trim()}
+            disabled={!isDirty || isBusy}
             className="inline-flex items-center gap-2 px-5 py-2.5 bg-amber-500 text-text-inverse text-sm font-medium rounded-md hover:bg-amber-300 active:scale-[0.98] transition-base disabled:opacity-40 disabled:cursor-not-allowed"
           >
-            {saving && <CircleNotchIcon size={14} className="animate-spin" />}
-            Save changes
+            {isBusy ? <CircleNotchIcon size={14} className="animate-spin" /> : null}
+            {saveLabel}
           </button>
         </form>
       </section>
@@ -272,7 +326,12 @@ export default function SettingsView({ user }: SettingsViewProps) {
 
           <button
             type="submit"
-            disabled={savingPassword || !currentPassword || !newPassword || newPassword !== confirmPassword}
+            disabled={
+              savingPassword ||
+              !currentPassword ||
+              !newPassword ||
+              newPassword !== confirmPassword
+            }
             className="inline-flex items-center gap-2 px-5 py-2.5 bg-amber-500 text-text-inverse text-sm font-medium rounded-md hover:bg-amber-300 active:scale-[0.98] transition-base disabled:opacity-40 disabled:cursor-not-allowed"
           >
             {savingPassword && <CircleNotchIcon size={14} className="animate-spin" />}
@@ -281,7 +340,7 @@ export default function SettingsView({ user }: SettingsViewProps) {
         </form>
       </section>
 
-      {/* Danger zone */}
+      {/* Account */}
       <section className="py-8">
         <h2 className="text-sm font-semibold text-text-primary mb-5">Account</h2>
 
