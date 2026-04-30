@@ -1,18 +1,19 @@
 "use client";
 
-import { useState, type ReactNode } from "react";
+import { useState, useEffect, useRef, type ReactNode } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import {
   ThumbsUpIcon,
   ThumbsDownIcon,
   ShareNetworkIcon,
-  DotsThreeIcon,
   UserPlusIcon,
   CheckIcon,
   EyeIcon,
 } from "@phosphor-icons/react";
+import { toast } from "sonner";
 import VideoPlayer from "./VideoPlayer";
+import SaveButton from "./SaveButton";
 import CommentList from "@/components/comment/CommentList";
 import { useLikes, useLikeMutation } from "@/hooks/useLike";
 import { useSubscription, useSubscribeMutation } from "@/hooks/useSubscription";
@@ -84,6 +85,19 @@ export default function WatchView({ video, related, poster }: WatchViewProps) {
   const [playing, setPlaying] = useState(false);
   const { session, requireAuth } = useRequireAuth();
   const isOwner = session?.user?.id === video.owner.id;
+  const recordedRef = useRef(false);
+
+  useEffect(() => {
+    if (!playing || recordedRef.current || !session?.user) return;
+    recordedRef.current = true;
+    fetch("/api/history", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ videoId: video.id }),
+    }).catch(() => {
+      recordedRef.current = false;
+    });
+  }, [playing, session?.user, video.id]);
 
   const { data: likes } = useLikes({ videoId: video.id });
   const likeMutation = useLikeMutation({ videoId: video.id });
@@ -206,14 +220,39 @@ export default function WatchView({ video, related, poster }: WatchViewProps) {
                 </button>
               </div>
 
-              <button className="inline-flex items-center gap-1.5 px-4 py-1.5 border border-border-default rounded-full text-xs font-medium text-text-secondary hover:bg-bg-hover transition-base">
+              <button
+                onClick={async () => {
+                  const url = `${window.location.origin}/watch/${video.id}`;
+                  const shareData = {
+                    title: video.title,
+                    text: video.description ?? undefined,
+                    url,
+                  };
+                  if (
+                    typeof navigator.share === "function" &&
+                    (typeof navigator.canShare !== "function" || navigator.canShare(shareData))
+                  ) {
+                    try {
+                      await navigator.share(shareData);
+                      return;
+                    } catch (err) {
+                      if ((err as Error).name === "AbortError") return;
+                    }
+                  }
+                  try {
+                    await navigator.clipboard.writeText(url);
+                    toast.success("Link copied");
+                  } catch {
+                    toast.error("Couldn't copy link");
+                  }
+                }}
+                className="inline-flex items-center gap-1.5 px-4 py-1.5 border border-border-default rounded-full text-xs font-medium text-text-secondary hover:bg-bg-hover transition-base"
+              >
                 <ShareNetworkIcon size={16} />
                 Share
               </button>
 
-              <button className="p-1.5 border border-border-default rounded-full text-text-secondary hover:bg-bg-hover transition-base">
-                <DotsThreeIcon size={16} weight="bold" />
-              </button>
+              <SaveButton videoId={video.id} />
             </div>
           </div>
 
