@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
@@ -25,6 +25,7 @@ export default function SignUpForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [isOAuthPending, startOAuthTransition] = useTransition();
 
   const passwordChecks = {
     length: password.length >= 8,
@@ -77,8 +78,10 @@ export default function SignUpForm() {
     }
   }
 
-  async function handleGoogleSignIn() {
-    signIn("google", { callbackUrl: "/" });
+  function handleGoogleSignIn() {
+    startOAuthTransition(() => {
+      signIn("google", { callbackUrl: "/" });
+    });
   }
 
   return (
@@ -102,9 +105,14 @@ export default function SignUpForm() {
       <button
         onClick={handleGoogleSignIn}
         type="button"
-        className="w-full flex items-center justify-center gap-3 px-4 py-2.5 bg-bg-surface border border-border-default rounded-lg text-sm font-medium text-text-primary hover:bg-bg-hover active:scale-[0.98] transition-base"
+        disabled={isOAuthPending}
+        className="w-full flex items-center justify-center gap-3 px-4 py-2.5 bg-bg-surface border border-border-default rounded-lg text-sm font-medium text-text-primary hover:bg-bg-hover active:scale-[0.98] transition-base disabled:opacity-60 disabled:cursor-not-allowed"
       >
-        <GoogleLogoIcon size={18} weight="bold" />
+        {isOAuthPending ? (
+          <CircleNotchIcon size={18} className="animate-spin" />
+        ) : (
+          <GoogleLogoIcon size={18} weight="bold" />
+        )}
         Continue with Google
       </button>
 
