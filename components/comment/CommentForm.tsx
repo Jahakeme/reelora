@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import Image from "next/image";
 import { PaperPlaneRightIcon } from "@phosphor-icons/react";
 import { useRequireAuth } from "@/hooks/useRequireAuth";
@@ -10,6 +10,7 @@ interface CommentFormProps {
   parentId?: string;
   placeholder?: string;
   autoFocus?: boolean;
+  mentionName?: string | null;
   onSubmit?: (body: string) => void;
   onCancel?: () => void;
 }
@@ -19,15 +20,25 @@ export default function CommentForm({
   parentId,
   placeholder = "Add a comment...",
   autoFocus = false,
+  mentionName,
   onSubmit,
   onCancel,
 }: CommentFormProps) {
   const { session, requireAuth } = useRequireAuth();
   const user = session?.user;
-  const [body, setBody] = useState("");
+  const initialBody = mentionName ? `@${mentionName} ` : "";
+  const [body, setBody] = useState(initialBody);
   const [focused, setFocused] = useState(autoFocus);
   const [submitting, setSubmitting] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  useEffect(() => {
+    if (autoFocus && textareaRef.current) {
+      const el = textareaRef.current;
+      const len = el.value.length;
+      el.setSelectionRange(len, len);
+    }
+  }, [autoFocus]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -51,7 +62,7 @@ export default function CommentForm({
 
       if (res.ok) {
         const data = await res.json();
-        setBody("");
+        setBody(initialBody);
         setFocused(false);
         onSubmit?.(data);
       }
@@ -61,7 +72,7 @@ export default function CommentForm({
   }
 
   function handleCancel() {
-    setBody("");
+    setBody(initialBody);
     setFocused(false);
     onCancel?.();
   }
@@ -94,6 +105,14 @@ export default function CommentForm({
             value={body}
             onChange={(e) => setBody(e.target.value)}
             onFocus={() => setFocused(true)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" && !e.shiftKey) {
+                e.preventDefault();
+                if (body.trim() && !submitting) {
+                  requireAuth(() => doSubmit());
+                }
+              }
+            }}
             placeholder={placeholder}
             rows={focused ? 3 : 1}
             maxLength={1000}

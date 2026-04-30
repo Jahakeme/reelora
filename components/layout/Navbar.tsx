@@ -103,8 +103,8 @@ export default function Navbar() {
         </form>
       </div>
 
-      {/* Right: Actions */}
-      <div className="flex items-center gap-1 shrink-0">
+      {/* Right: Actions (hidden on mobile — covered by bottom nav) */}
+      <div className="hidden md:flex items-center gap-1 shrink-0">
         <Link
           href="/upload"
           className={`p-2 rounded-lg transition-base focus-ring ${
